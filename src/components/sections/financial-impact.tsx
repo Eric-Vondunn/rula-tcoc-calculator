@@ -39,6 +39,22 @@ export function FinancialImpact() {
   );
   const hasAvoidable = financialResults.some((r) => r.potentiallyAvoidableSpending !== null);
 
+  // Population-level savings by component
+  const totalMedicalSavings = treatedVsUntreatedResults.reduce(
+    (sum, r) => sum + ((r.untreatedPopulation ?? 0) * (r.untreatedMedicalClaims - r.treatedMedicalClaims)), 0
+  );
+  const totalAbsenteeismSavings = treatedVsUntreatedResults.reduce(
+    (sum, r) => sum + ((r.untreatedPopulation ?? 0) * (r.untreatedAbsenteeismCost - r.treatedAbsenteeismCost)), 0
+  );
+  const totalStdSavings = treatedVsUntreatedResults.reduce(
+    (sum, r) => sum + ((r.untreatedPopulation ?? 0) * (r.untreatedStdCost - r.treatedStdCost)), 0
+  );
+  const totalRulaCost = treatedVsUntreatedResults.reduce(
+    (sum, r) => sum + ((r.untreatedPopulation ?? 0) * r.rulaTreatmentCost), 0
+  );
+  const totalGrossSavings = totalMedicalSavings + totalAbsenteeismSavings + totalStdSavings;
+  const totalNetAllComponents = totalGrossSavings - totalRulaCost;
+
   const chartData = financialResults
     .filter((r) => r.modeledAnnualSpending !== null)
     .map((r) => ({
@@ -132,6 +148,46 @@ export function FinancialImpact() {
               ) : (
                 <p className="text-sm text-gray-400 italic">Set recoverable % to calculate</p>
               )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Total Savings by Component */}
+      <Card className="border-green-200 bg-gradient-to-br from-green-50/50 to-white">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Projected Annual Savings (Treated vs Untreated)</CardTitle>
+          <CardDescription className="text-xs text-amber-700">
+            Population-level savings if untreated BH individuals received treatment. Includes overlap across conditions.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="space-y-1">
+              <p className="text-sm text-gray-500">Medical Claims</p>
+              <p className="text-xl font-bold text-green-700 tracking-tight">{formatCurrency(totalMedicalSavings)}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-gray-500">Absenteeism</p>
+              <p className="text-xl font-bold text-green-700 tracking-tight">{formatCurrency(totalAbsenteeismSavings)}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-gray-500">Short-Term Disability</p>
+              <p className="text-xl font-bold text-green-700 tracking-tight">{formatCurrency(totalStdSavings)}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-gray-500">Gross Savings</p>
+              <p className="text-xl font-bold text-green-700 tracking-tight">{formatCurrency(totalGrossSavings)}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-gray-500">Rula Investment</p>
+              <p className="text-xl font-bold text-gray-900 tracking-tight">{formatCurrency(totalRulaCost)}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-gray-500">Net Savings</p>
+              <p className={`text-xl font-bold tracking-tight ${totalNetAllComponents >= 0 ? 'text-emerald-700' : 'text-red-600'}`}>
+                {formatCurrency(totalNetAllComponents)}
+              </p>
             </div>
           </div>
         </CardContent>
