@@ -1,0 +1,380 @@
+// ============================================================
+// RULA TCOC Calculator — Research Benchmark Data
+// ============================================================
+// Each data point carries an approval status:
+//   "approved"              → verified against original source
+//   "pending_verification"  → plausible; awaiting formal verification
+//   "rejected"              → inaccurate or inapplicable
+//
+// IMPORTANT: Depression and anxiety rates are NOT summed.
+// ============================================================
+
+import type {
+  BenchmarkSource,
+  ConditionBenchmark,
+  CostBenchmark,
+  ConditionId,
+} from '@/types';
+
+// ============================================================
+// Source Definitions
+// ============================================================
+
+export const sources: Record<string, BenchmarkSource> = {
+  cdc_diabetes_2023: {
+    sourceId: 'cdc_diabetes_2023',
+    publisher: 'Centers for Disease Control and Prevention (CDC)',
+    studyTitle: 'National Diabetes Statistics Report, 2023',
+    publicationYear: 2023,
+    sourceUrl: 'https://www.cdc.gov/diabetes/data/statistics-report/index.html',
+    doi: null,
+    exactStatistic: 0.116,
+    numeratorDefinition: 'Adults aged 18+ with diagnosed diabetes',
+    denominatorDefinition: 'US civilian noninstitutionalized adult population',
+    ageRange: '18+',
+    insurancePopulation: 'All insurance types',
+    geographicScope: 'United States',
+    observationPeriod: '2019-2021',
+    evidenceType: 'observed',
+    causalityType: 'association',
+    dateVerified: null,
+    approvalStatus: 'pending_verification',
+  },
+
+  anderson_diabetes_depression_2001: {
+    sourceId: 'anderson_diabetes_depression_2001',
+    publisher: 'American Diabetes Association / Diabetes Care',
+    studyTitle: 'The prevalence of comorbid depression in adults with diabetes: a meta-analysis',
+    publicationYear: 2001,
+    sourceUrl: 'https://pubmed.ncbi.nlm.nih.gov/11375373/',
+    doi: '10.2337/diacare.24.6.1069',
+    exactStatistic: 0.25,
+    numeratorDefinition: 'Adults with type 2 diabetes meeting criteria for depression',
+    denominatorDefinition: 'Adults with type 2 diabetes across included studies',
+    ageRange: '18+',
+    insurancePopulation: 'Mixed',
+    geographicScope: 'International (meta-analysis)',
+    observationPeriod: 'Studies through 2000',
+    evidenceType: 'observed',
+    causalityType: 'association',
+    dateVerified: null,
+    approvalStatus: 'pending_verification',
+  },
+
+  aha_heart_stats_2024: {
+    sourceId: 'aha_heart_stats_2024',
+    publisher: 'American Heart Association (AHA)',
+    studyTitle: 'Heart Disease and Stroke Statistics — 2024 Update',
+    publicationYear: 2024,
+    sourceUrl: 'https://www.ahajournals.org/doi/10.1161/CIR.0000000000001209',
+    doi: '10.1161/CIR.0000000000001209',
+    exactStatistic: 0.094,
+    numeratorDefinition: 'Adults with coronary heart disease, heart failure, or stroke',
+    denominatorDefinition: 'US adult population aged 20+',
+    ageRange: '20+',
+    insurancePopulation: 'All insurance types',
+    geographicScope: 'United States',
+    observationPeriod: '2017-2020 (NHANES)',
+    evidenceType: 'observed',
+    causalityType: 'association',
+    dateVerified: null,
+    approvalStatus: 'pending_verification',
+  },
+
+  lichtman_aha_depression_cvd_2014: {
+    sourceId: 'lichtman_aha_depression_cvd_2014',
+    publisher: 'American Heart Association (AHA) / Circulation',
+    studyTitle: 'Depression as a risk factor for poor prognosis among patients with acute coronary syndrome: AHA Science Advisory',
+    publicationYear: 2014,
+    sourceUrl: 'https://pubmed.ncbi.nlm.nih.gov/24170662/',
+    doi: '10.1161/CIR.0000000000000019',
+    exactStatistic: 0.20,
+    numeratorDefinition: 'Patients with ACS or CHD meeting criteria for major depressive disorder',
+    denominatorDefinition: 'Patients with ACS / CHD across reviewed studies',
+    ageRange: '18+',
+    insurancePopulation: 'Mixed',
+    geographicScope: 'International (systematic review)',
+    observationPeriod: 'Studies through 2013',
+    evidenceType: 'observed',
+    causalityType: 'association',
+    dateVerified: null,
+    approvalStatus: 'pending_verification',
+  },
+
+  acs_cancer_prevalence_2022: {
+    sourceId: 'acs_cancer_prevalence_2022',
+    publisher: 'American Cancer Society (ACS)',
+    studyTitle: 'Cancer Treatment and Survivorship Facts & Figures 2022-2024',
+    publicationYear: 2022,
+    sourceUrl: 'https://www.cancer.org/research/cancer-facts-statistics/survivor-facts-figures.html',
+    doi: null,
+    exactStatistic: 0.054,
+    numeratorDefinition: 'Individuals alive with a history of cancer diagnosis (limited-duration prevalence)',
+    denominatorDefinition: 'Total US population',
+    ageRange: 'All ages',
+    insurancePopulation: 'All insurance types',
+    geographicScope: 'United States',
+    observationPeriod: '2022 estimate',
+    evidenceType: 'modeled',
+    causalityType: 'association',
+    dateVerified: null,
+    approvalStatus: 'pending_verification',
+  },
+
+  mitchell_cancer_depression_2011: {
+    sourceId: 'mitchell_cancer_depression_2011',
+    publisher: 'The Lancet Oncology',
+    studyTitle: 'Prevalence of depression, anxiety, and adjustment disorder in oncological, haematological, and palliative-care settings: a meta-analysis of 94 interview-based studies',
+    publicationYear: 2011,
+    sourceUrl: 'https://pubmed.ncbi.nlm.nih.gov/21251875/',
+    doi: '10.1016/S1470-2045(11)70002-X',
+    exactStatistic: 0.22,
+    numeratorDefinition: 'Cancer patients meeting diagnostic criteria for major depression via clinical interview',
+    denominatorDefinition: 'Oncological / haematological patients across 94 interview-based studies',
+    ageRange: '18+',
+    insurancePopulation: 'Mixed',
+    geographicScope: 'International (meta-analysis)',
+    observationPeriod: 'Studies through 2010',
+    evidenceType: 'observed',
+    causalityType: 'association',
+    dateVerified: null,
+    approvalStatus: 'pending_verification',
+  },
+
+  cdc_chronic_pain_2023: {
+    sourceId: 'cdc_chronic_pain_2023',
+    publisher: 'Centers for Disease Control and Prevention (CDC)',
+    studyTitle: 'Chronic Pain and High-Impact Chronic Pain Among U.S. Adults, 2019',
+    publicationYear: 2023,
+    sourceUrl: 'https://www.cdc.gov/nchs/products/databriefs/db390.htm',
+    doi: null,
+    exactStatistic: 0.209,
+    numeratorDefinition: 'Adults aged 18+ reporting chronic pain on most days or every day in past 3 months',
+    denominatorDefinition: 'US civilian noninstitutionalized adult population',
+    ageRange: '18+',
+    insurancePopulation: 'All insurance types',
+    geographicScope: 'United States',
+    observationPeriod: '2019 NHIS',
+    evidenceType: 'observed',
+    causalityType: 'association',
+    dateVerified: null,
+    approvalStatus: 'pending_verification',
+  },
+
+  bair_chronic_pain_depression_2003: {
+    sourceId: 'bair_chronic_pain_depression_2003',
+    publisher: 'Archives of Internal Medicine',
+    studyTitle: 'Depression and pain comorbidity: a literature review',
+    publicationYear: 2003,
+    sourceUrl: 'https://pubmed.ncbi.nlm.nih.gov/14609780/',
+    doi: '10.1001/archinte.163.20.2433',
+    exactStatistic: 0.40,
+    numeratorDefinition: 'Chronic pain patients meeting criteria for depression or clinically significant depressive symptoms',
+    denominatorDefinition: 'Patients with chronic pain across reviewed clinical studies',
+    ageRange: '18+',
+    insurancePopulation: 'Mixed (clinical settings)',
+    geographicScope: 'International (literature review)',
+    observationPeriod: 'Studies through 2002',
+    evidenceType: 'observed',
+    causalityType: 'association',
+    dateVerified: null,
+    approvalStatus: 'pending_verification',
+  },
+
+  cdc_ibd_prevalence_2015: {
+    sourceId: 'cdc_ibd_prevalence_2015',
+    publisher: 'Centers for Disease Control and Prevention (CDC)',
+    studyTitle: 'Prevalence of Inflammatory Bowel Disease Among Adults Aged >=18 Years — United States, 2015',
+    publicationYear: 2016,
+    sourceUrl: 'https://www.cdc.gov/mmwr/volumes/65/wr/mm6542a3.htm',
+    doi: '10.15585/mmwr.mm6542a3',
+    exactStatistic: 0.013,
+    numeratorDefinition: 'Adults aged 18+ self-reporting a diagnosis of Crohn\'s disease or ulcerative colitis',
+    denominatorDefinition: 'US civilian noninstitutionalized adult population',
+    ageRange: '18+',
+    insurancePopulation: 'All insurance types',
+    geographicScope: 'United States',
+    observationPeriod: '2015 NHIS',
+    evidenceType: 'observed',
+    causalityType: 'association',
+    dateVerified: null,
+    approvalStatus: 'pending_verification',
+  },
+
+  neuendorf_ibd_depression_2016: {
+    sourceId: 'neuendorf_ibd_depression_2016',
+    publisher: 'Journal of Psychosomatic Research',
+    studyTitle: 'Depression and anxiety in patients with inflammatory bowel disease: a systematic review',
+    publicationYear: 2016,
+    sourceUrl: 'https://pubmed.ncbi.nlm.nih.gov/27772557/',
+    doi: '10.1016/j.jpsychores.2016.09.007',
+    exactStatistic: 0.27,
+    numeratorDefinition: 'IBD patients meeting screening or diagnostic criteria for depression',
+    denominatorDefinition: 'IBD patients (Crohn\'s disease or ulcerative colitis) across reviewed studies',
+    ageRange: '18+',
+    insurancePopulation: 'Mixed',
+    geographicScope: 'International (systematic review)',
+    observationPeriod: 'Studies through 2015',
+    evidenceType: 'observed',
+    causalityType: 'association',
+    dateVerified: null,
+    approvalStatus: 'pending_verification',
+  },
+
+  nimh_mental_health_treatment_2023: {
+    sourceId: 'nimh_mental_health_treatment_2023',
+    publisher: 'National Institute of Mental Health (NIMH)',
+    studyTitle: 'Mental Illness — Statistics: Prevalence of Any Mental Illness (AMI)',
+    publicationYear: 2023,
+    sourceUrl: 'https://www.nimh.nih.gov/health/statistics/mental-illness',
+    doi: null,
+    exactStatistic: 0.57,
+    numeratorDefinition: 'Adults aged 18+ with any mental illness who did NOT receive treatment in the past year',
+    denominatorDefinition: 'Adults aged 18+ with any mental illness (AMI)',
+    ageRange: '18+',
+    insurancePopulation: 'All insurance types',
+    geographicScope: 'United States',
+    observationPeriod: '2021 NSDUH',
+    evidenceType: 'observed',
+    causalityType: 'association',
+    dateVerified: null,
+    approvalStatus: 'pending_verification',
+  },
+
+  unverified_ibi_cost_2024: {
+    sourceId: 'unverified_ibi_cost_2024',
+    publisher: 'Integrated Benefits Institute (IBI)',
+    studyTitle: 'Estimated annual incremental cost of untreated behavioral health comorbidity',
+    publicationYear: 2024,
+    sourceUrl: null,
+    doi: null,
+    exactStatistic: 10000,
+    numeratorDefinition: 'Incremental annual per-member cost attributable to untreated BH comorbidity',
+    denominatorDefinition: 'Commercially insured members with chronic condition and co-occurring untreated BH condition',
+    ageRange: '18-64',
+    insurancePopulation: 'Employer-sponsored',
+    geographicScope: 'United States',
+    observationPeriod: 'Unspecified',
+    evidenceType: 'modeled',
+    causalityType: 'association',
+    dateVerified: null,
+    approvalStatus: 'pending_verification',
+  },
+};
+
+// ============================================================
+// Condition Benchmarks
+// ============================================================
+
+export const conditionBenchmarks: ConditionBenchmark[] = [
+  {
+    conditionId: 'diabetes',
+    conditionName: 'Type 2 Diabetes',
+    clinicalDefinition: 'ICD-10 E11.x — Type 2 diabetes mellitus. Includes managed and unmanaged diagnoses.',
+    prevalenceRate: 0.116,
+    prevalenceDenominator: 'adult_members',
+    prevalenceSource: sources.cdc_diabetes_2023,
+    bhComorbidityRate: 0.25,
+    bhDefinition: 'Major depressive disorder or clinically significant depressive symptoms among adults with type 2 diabetes (Anderson et al. 2001 meta-analysis). Depression only — NOT depression + anxiety.',
+    bhComorbiditySource: sources.anderson_diabetes_depression_2001,
+    untreatedRate: 0.57,
+    untreatedSource: sources.nimh_mental_health_treatment_2023,
+    notes: 'Prevalence is adult-specific (18+). BH comorbidity reflects depression only.',
+  },
+  {
+    conditionId: 'cardiovascular',
+    conditionName: 'Cardiovascular Disease',
+    clinicalDefinition: 'Coronary heart disease, heart failure, or stroke (ICD-10 I20-I25, I50, I60-I69).',
+    prevalenceRate: 0.094,
+    prevalenceDenominator: 'adult_members',
+    prevalenceSource: sources.aha_heart_stats_2024,
+    bhComorbidityRate: 0.20,
+    bhDefinition: 'Major depressive disorder among patients with ACS or CHD (AHA 2014 Science Advisory). Depression only — NOT depression + anxiety.',
+    bhComorbiditySource: sources.lichtman_aha_depression_cvd_2014,
+    untreatedRate: 0.57,
+    untreatedSource: sources.nimh_mental_health_treatment_2023,
+    notes: 'Prevalence denominator is adults aged 20+ per AHA methodology. BH comorbidity reflects depression only.',
+  },
+  {
+    conditionId: 'cancer',
+    conditionName: 'Cancer (Active Treatment or Survivorship)',
+    clinicalDefinition: 'Any cancer diagnosis (ICD-10 C00-C97) — includes active treatment or post-treatment survivorship.',
+    prevalenceRate: 0.054,
+    prevalenceDenominator: 'total_members',
+    prevalenceSource: sources.acs_cancer_prevalence_2022,
+    bhComorbidityRate: 0.22,
+    bhDefinition: 'Major depression among oncological patients via clinical interview (Mitchell et al. 2011). Depression only — NOT depression + anxiety.',
+    bhComorbiditySource: sources.mitchell_cancer_depression_2011,
+    untreatedRate: 0.57,
+    untreatedSource: sources.nimh_mental_health_treatment_2023,
+    notes: 'Cancer prevalence is limited-duration across all ages. BH rate is depression only.',
+  },
+  {
+    conditionId: 'musculoskeletal',
+    conditionName: 'Musculoskeletal / Chronic Pain',
+    clinicalDefinition: 'Chronic pain lasting most days or every day for 3+ months (ICD-10 M00-M99, G89).',
+    prevalenceRate: 0.209,
+    prevalenceDenominator: 'adult_members',
+    prevalenceSource: sources.cdc_chronic_pain_2023,
+    bhComorbidityRate: 0.40,
+    bhDefinition: 'Depression or clinically significant depressive symptoms among chronic pain patients (Bair et al. 2003). Single composite rate — NOT a sum of depression + anxiety.',
+    bhComorbiditySource: sources.bair_chronic_pain_depression_2003,
+    untreatedRate: 0.57,
+    untreatedSource: sources.nimh_mental_health_treatment_2023,
+    notes: 'Chronic pain prevalence is adult-specific (18+). Highest BH comorbidity rate among tracked conditions.',
+  },
+  {
+    conditionId: 'gastrointestinal',
+    conditionName: 'Gastrointestinal — Inflammatory Bowel Disease',
+    clinicalDefinition: 'Crohn\'s disease or ulcerative colitis (ICD-10 K50-K51).',
+    prevalenceRate: 0.013,
+    prevalenceDenominator: 'adult_members',
+    prevalenceSource: sources.cdc_ibd_prevalence_2015,
+    bhComorbidityRate: 0.27,
+    bhDefinition: 'Depression among IBD patients (Neuendorf et al. 2016 systematic review). Depression only — NOT depression + anxiety.',
+    bhComorbiditySource: sources.neuendorf_ibd_depression_2016,
+    untreatedRate: 0.57,
+    untreatedSource: sources.nimh_mental_health_treatment_2023,
+    notes: 'IBD prevalence is adult-specific (18+). Broader GI conditions (e.g., IBS) are not included.',
+  },
+  {
+    conditionId: 'specialty_rx_glp1',
+    conditionName: 'Specialty Rx — GLP-1 Receptor Agonist Utilizers',
+    clinicalDefinition: 'Members with pharmacy claims for GLP-1 receptor agonists (semaglutide, tirzepatide, liraglutide, dulaglutide, etc.).',
+    prevalenceRate: null,
+    prevalenceDenominator: 'total_members',
+    prevalenceSource: null,
+    bhComorbidityRate: null,
+    bhDefinition: 'No approved behavioral health comorbidity rate. GLP-1 utilizer populations span diabetes, obesity, and cardiovascular risk — each with different BH profiles.',
+    bhComorbiditySource: null,
+    untreatedRate: null,
+    untreatedSource: null,
+    notes: 'NO approved benchmarks. Population size must come from client pharmacy claims data.',
+  },
+];
+
+// ============================================================
+// Cost Benchmarks
+// ============================================================
+
+export const costBenchmarks: CostBenchmark[] = [
+  {
+    benchmarkId: 'ibi_incremental_10k',
+    label: '$10,000 Annual Incremental Cost (IBI — Unverified)',
+    annualIncrementalCost: 10000,
+    description: 'Estimated annual incremental cost per commercially insured member with a chronic condition and co-occurring untreated behavioral health condition. This figure has NOT been independently verified against a specific published IBI report.',
+    source: sources.unverified_ibi_cost_2024,
+  },
+];
+
+// ============================================================
+// Lookup Helpers
+// ============================================================
+
+export function getConditionBenchmark(conditionId: ConditionId): ConditionBenchmark | undefined {
+  return conditionBenchmarks.find((cb) => cb.conditionId === conditionId);
+}
+
+export function getCostBenchmark(benchmarkId: string): CostBenchmark | undefined {
+  return costBenchmarks.find((cb) => cb.benchmarkId === benchmarkId);
+}
