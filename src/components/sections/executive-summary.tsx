@@ -11,8 +11,11 @@ import { conditionBenchmarks } from '@/data/benchmarks';
 
 export function ExecutiveSummary() {
   const { state, derived } = useCalculator();
-  const { clientInputs } = state;
-  const { populationResults, financialResults, scenarioResults, adultMembers } = derived;
+  const { clientInputs, absenteeismInputs } = state;
+  const {
+    populationResults, financialResults, scenarioResults, adultMembers,
+    absenteeismResult, treatedVsUntreatedResults,
+  } = derived;
 
   const clientName = clientInputs.clientName || 'Employer';
   const availableConditions = populationResults.filter((r) => r.dataAvailable);
@@ -41,6 +44,11 @@ export function ExecutiveSummary() {
     (sum, r) => sum + (r.netSavings ?? 0), 0
   );
 
+  // Treated vs untreated aggregate
+  const totalPopulationSavings = treatedVsUntreatedResults.reduce(
+    (sum, r) => sum + (r.populationSavings ?? 0), 0
+  );
+
   const generateNarrative = (): string => {
     const condCount = availableConditions.length;
     const totalMembers = formatNumber(clientInputs.totalCoveredMembers);
@@ -48,6 +56,8 @@ export function ExecutiveSummary() {
     let narrative = `Based on national population health benchmarks, an employer with ${totalMembers} covered members may have a meaningful population experiencing co-occurring chronic physical and behavioral health conditions across ${condCount} evaluated condition categories.`;
 
     narrative += ' Improving access to appropriate behavioral health treatment may offer opportunities to reduce medical utilization and associated spending.';
+
+    narrative += ` Beyond direct medical costs, untreated behavioral health conditions drive significant productivity losses through absenteeism. Research indicates that individuals with untreated mental health conditions miss approximately ${absenteeismResult.missedDaysChronicUntreated} workdays per year when combined with a chronic condition — compared to ${absenteeismResult.missedDaysNoMh} days for those without mental health conditions. At an average salary of ${formatCurrency(absenteeismInputs.averageSalary)}, this represents a meaningful per-employee cost to the organization.`;
 
     narrative += ' Financial estimates depend on the specific population mix, treatment engagement rates, intervention costs, and realized clinical outcomes.';
 
@@ -156,6 +166,60 @@ export function ExecutiveSummary() {
                 </div>
               </>
             )}
+          </div>
+          <Separator className="my-4" />
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Absenteeism & Productivity</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="space-y-1">
+              <p className="text-sm text-gray-500">Total Missed Days (Untreated)</p>
+              <p className="text-2xl font-bold text-red-600">
+                {formatNumber(absenteeismResult.totalMissedDaysUntreated)}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-gray-500">Total Productivity Loss</p>
+              <p className="text-2xl font-bold text-red-600">
+                {formatCurrency(absenteeismResult.totalProductivityLossUntreated)}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-gray-500">Rula Investment</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {formatCurrency(absenteeismResult.totalRulaTreatmentCost)}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-gray-500">Net Productivity Savings</p>
+              <p className={`text-2xl font-bold ${absenteeismResult.netProductivitySavings >= 0 ? 'text-emerald-700' : 'text-red-600'}`}>
+                {formatCurrency(absenteeismResult.netProductivitySavings)}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-gray-500">Savings/Person (Treated vs Untreated)</p>
+              <p className="text-2xl font-bold text-green-700">
+                {treatedVsUntreatedResults.length > 0
+                  ? formatCurrency(treatedVsUntreatedResults[0].annualSavingsPerPerson)
+                  : 'N/A'}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-gray-500">Total Population Savings</p>
+              <p className="text-2xl font-bold text-green-700">
+                {formatCurrency(totalPopulationSavings)}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-gray-500">Avg Days Missed (Untreated + Chronic)</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {absenteeismResult.missedDaysChronicUntreated} days
+              </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-gray-500">Avg Days Missed (Treated + Chronic)</p>
+              <p className="text-2xl font-bold text-teal-700">
+                {absenteeismResult.missedDaysChronicTreated} days
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -308,6 +372,147 @@ export function ExecutiveSummary() {
         </Card>
       )}
 
+      {/* Absenteeism & Productivity Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Absenteeism & Productivity Impact</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-4 font-medium text-gray-500">Condition</th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-500">Untreated Pop.</th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-500">Missed Days</th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-500">Productivity Loss</th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-500">Productivity Gain</th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-500">Rula Cost</th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-500">Net Savings</th>
+                </tr>
+              </thead>
+              <tbody>
+                {absenteeismResult.conditionBreakdown.map((c) => (
+                  <tr key={c.conditionId} className="border-b border-gray-100">
+                    <td className="py-3 px-4 font-medium text-gray-900">{c.conditionName}</td>
+                    <td className="py-3 px-4 text-right text-gray-700">
+                      {c.untreatedCount !== null ? formatNumber(c.untreatedCount) : 'N/A'}
+                    </td>
+                    <td className="py-3 px-4 text-right text-gray-700">
+                      {c.totalMissedDays !== null ? formatNumber(c.totalMissedDays) : 'N/A'}
+                    </td>
+                    <td className="py-3 px-4 text-right text-red-600 font-medium">
+                      {c.productivityLoss !== null ? formatCurrency(c.productivityLoss) : 'N/A'}
+                    </td>
+                    <td className="py-3 px-4 text-right text-green-700 font-medium">
+                      {c.productivityGain !== null ? formatCurrency(c.productivityGain) : 'N/A'}
+                    </td>
+                    <td className="py-3 px-4 text-right text-gray-700">
+                      {c.rulaCost !== null ? formatCurrency(c.rulaCost) : 'N/A'}
+                    </td>
+                    <td className="py-3 px-4 text-right font-semibold">
+                      {c.netSavings !== null ? (
+                        <span className={c.netSavings >= 0 ? 'text-emerald-700' : 'text-red-600'}>
+                          {formatCurrency(c.netSavings)}
+                        </span>
+                      ) : 'N/A'}
+                    </td>
+                  </tr>
+                ))}
+                <tr className="border-t-2 border-gray-300 bg-gray-50">
+                  <td className="py-3 px-4 font-bold text-gray-900">
+                    Combined Total
+                    <span className="block text-xs font-normal text-amber-700">Includes overlap</span>
+                  </td>
+                  <td className="py-3 px-4 text-right font-bold text-gray-900">
+                    {formatNumber(absenteeismResult.totalUntreatedPopulation)}
+                  </td>
+                  <td className="py-3 px-4 text-right font-bold text-gray-900">
+                    {formatNumber(absenteeismResult.totalMissedDaysUntreated)}
+                  </td>
+                  <td className="py-3 px-4 text-right font-bold text-red-600">
+                    {formatCurrency(absenteeismResult.totalProductivityLossUntreated)}
+                  </td>
+                  <td className="py-3 px-4 text-right font-bold text-green-700">
+                    {formatCurrency(absenteeismResult.totalProductivityGain)}
+                  </td>
+                  <td className="py-3 px-4 text-right font-bold text-gray-900">
+                    {formatCurrency(absenteeismResult.totalRulaTreatmentCost)}
+                  </td>
+                  <td className="py-3 px-4 text-right font-bold">
+                    <span className={absenteeismResult.netProductivitySavings >= 0 ? 'text-emerald-700' : 'text-red-600'}>
+                      {formatCurrency(absenteeismResult.netProductivitySavings)}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-4 text-xs text-gray-400 italic">
+            Based on avg salary of {formatCurrency(absenteeismInputs.averageSalary)} and {absenteeismInputs.workdaysPerYear} workdays/year.
+            Rula treatment: $130/session × 10 sessions = $1,300/person. {OVERLAP_DISCLAIMER}
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Treated vs Untreated Per-Person Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Treated vs Untreated: Per-Person Annual Cost</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {treatedVsUntreatedResults.length > 0 && (() => {
+            const r = treatedVsUntreatedResults[0];
+            return (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-3 px-4 font-medium text-gray-500">Cost Component</th>
+                      <th className="text-right py-3 px-4 font-medium text-red-600">Untreated</th>
+                      <th className="text-right py-3 px-4 font-medium text-teal-600">Treated (Rula)</th>
+                      <th className="text-right py-3 px-4 font-medium text-green-600">Savings</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 text-gray-700">Incremental Medical Claims</td>
+                      <td className="py-3 px-4 text-right text-red-700 font-medium">{formatCurrency(r.untreatedMedicalClaims)}</td>
+                      <td className="py-3 px-4 text-right text-teal-700 font-medium">{formatCurrency(r.treatedMedicalClaims)}</td>
+                      <td className="py-3 px-4 text-right text-green-700 font-medium">{formatCurrency(r.untreatedMedicalClaims - r.treatedMedicalClaims)}</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 text-gray-700">Absenteeism / Productivity</td>
+                      <td className="py-3 px-4 text-right text-red-700 font-medium">{formatCurrency(r.untreatedAbsenteeismCost)}</td>
+                      <td className="py-3 px-4 text-right text-teal-700 font-medium">{formatCurrency(r.treatedAbsenteeismCost)}</td>
+                      <td className="py-3 px-4 text-right text-green-700 font-medium">{formatCurrency(r.untreatedAbsenteeismCost - r.treatedAbsenteeismCost)}</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 text-gray-700">Short-Term Disability</td>
+                      <td className="py-3 px-4 text-right text-red-700 font-medium">{formatCurrency(r.untreatedStdCost)}</td>
+                      <td className="py-3 px-4 text-right text-teal-700 font-medium">{formatCurrency(r.treatedStdCost)}</td>
+                      <td className="py-3 px-4 text-right text-green-700 font-medium">{formatCurrency(r.untreatedStdCost - r.treatedStdCost)}</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 text-gray-700">Rula Treatment Cost</td>
+                      <td className="py-3 px-4 text-right text-gray-400">—</td>
+                      <td className="py-3 px-4 text-right text-teal-700 font-medium">{formatCurrency(r.rulaTreatmentCost)}</td>
+                      <td className="py-3 px-4 text-right text-gray-400">—</td>
+                    </tr>
+                    <tr className="border-t-2 border-gray-300 bg-gray-50">
+                      <td className="py-3 px-4 font-bold text-gray-900">Total Per Person / Year</td>
+                      <td className="py-3 px-4 text-right font-bold text-red-700">{formatCurrency(r.untreatedTotalCost)}</td>
+                      <td className="py-3 px-4 text-right font-bold text-teal-700">{formatCurrency(r.treatedTotalCost)}</td>
+                      <td className="py-3 px-4 text-right font-bold text-green-700">{formatCurrency(r.annualSavingsPerPerson)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            );
+          })()}
+        </CardContent>
+      </Card>
+
       {/* Key Assumptions */}
       <Card>
         <CardHeader>
@@ -327,6 +532,12 @@ export function ExecutiveSummary() {
               {clientInputs.recoverableCostPercentage !== null && (
                 <li>Recoverable cost percentage: {(clientInputs.recoverableCostPercentage * 100).toFixed(0)}%</li>
               )}
+              <li>Average salary: {formatCurrency(absenteeismInputs.averageSalary)} / {absenteeismInputs.workdaysPerYear} workdays/year</li>
+              <li>
+                Rula treatment cost: $130/session × 10 avg sessions = $1,300/person{' '}
+                <Badge variant="warning" className="text-xs">Pending Verification</Badge>
+              </li>
+              <li>Missed workdays: ~{absenteeismResult.missedDaysNoMh} (no MH), ~{absenteeismResult.missedDaysChronicUntreated} (chronic + untreated MH), ~{absenteeismResult.missedDaysChronicTreated} (chronic + treated MH)</li>
             </ul>
           </div>
 
@@ -341,6 +552,8 @@ export function ExecutiveSummary() {
               <li>The $10,000 cost benchmark has not been verified against the claimed source.</li>
               <li>BH comorbidity rates reflect depression only (not combined depression + anxiety).</li>
               <li>Scenario assumptions are hypothetical unless verified with Rula operational data.</li>
+              <li>Absenteeism benchmarks are population averages (Kessler, Greenberg, Loeppke) and may not reflect this employer&apos;s workforce.</li>
+              <li>Productivity loss assumes full daily cost for each missed day. Actual employer cost may vary.</li>
             </ul>
           </div>
 
