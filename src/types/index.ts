@@ -158,11 +158,89 @@ export interface AggregateScenarioResult {
 }
 
 // ============================================================
+// Absenteeism & Productivity Types
+// ============================================================
+
+export interface AbsenteeismInputs {
+  averageSalary: number;
+  workdaysPerYear: number;
+}
+
+export interface AbsenteeismBenchmarks {
+  missedDaysNoMh: number;
+  missedDaysUntreatedMh: number;
+  missedDaysTreatedMh: number;
+  missedDaysChronicPlusUntreatedMh: number;
+  missedDaysChronicPlusTreatedMh: number;
+  incrementalMedicalClaimsUntreated: number;
+  incrementalMedicalClaimsTreated: number;
+  stdCostMultiplierUntreated: number;
+  stdCostMultiplierTreated: number;
+  annualStdBaselineCost: number;
+  rulaCostPerSession: number;
+  rulaAvgSessions: number;
+}
+
+export interface TreatedVsUntreatedCost {
+  conditionId: ConditionId;
+  conditionName: string;
+  untreatedMedicalClaims: number;
+  untreatedAbsenteeismCost: number;
+  untreatedStdCost: number;
+  untreatedTotalCost: number;
+  treatedMedicalClaims: number;
+  treatedAbsenteeismCost: number;
+  treatedStdCost: number;
+  treatedTotalCost: number;
+  rulaTreatmentCost: number;
+  annualSavingsPerPerson: number;
+  untreatedPopulation: number | null;
+  populationSavings: number | null;
+}
+
+export interface AbsenteeismResult {
+  dailyCost: number;
+  missedDaysNoMh: number;
+  missedDaysUntreatedMh: number;
+  missedDaysTreatedMh: number;
+  missedDaysChronicUntreated: number;
+  missedDaysChronicTreated: number;
+  incrementalDaysUntreated: number;
+  incrementalDaysTreated: number;
+  perPersonProductivityLossUntreated: number;
+  perPersonProductivityLossTreated: number;
+  totalUntreatedPopulation: number;
+  totalMissedDaysUntreated: number;
+  totalProductivityLossUntreated: number;
+  rulaCostPerPerson: number;
+  totalRulaTreatmentCost: number;
+  totalMissedDaysAfterTreatment: number;
+  totalProductivityGain: number;
+  netProductivitySavings: number;
+  conditionBreakdown: ConditionAbsenteeismResult[];
+}
+
+export interface ConditionAbsenteeismResult {
+  conditionId: ConditionId;
+  conditionName: string;
+  untreatedCount: number | null;
+  missedDaysPerPerson: number;
+  totalMissedDays: number | null;
+  productivityLoss: number | null;
+  missedDaysAfterTreatment: number;
+  totalMissedDaysAfterTreatment: number | null;
+  productivityGain: number | null;
+  rulaCost: number | null;
+  netSavings: number | null;
+}
+
+// ============================================================
 // Application State
 // ============================================================
 
 export interface AppState {
   clientInputs: ClientInputs;
   scenarios: ScenarioSet;
+  absenteeismInputs: AbsenteeismInputs;
   activeTab: string;
 }

@@ -6,14 +6,18 @@ import type {
   ScenarioSet,
   ScenarioType,
   ScenarioAssumptions,
+  AbsenteeismInputs,
   ConditionPopulationResult,
   ConditionFinancialResult,
   ScenarioResult,
+  AbsenteeismResult,
+  TreatedVsUntreatedCost,
 } from '@/types';
-import { defaultClientInputs, defaultScenarios } from '@/data/defaults';
+import { defaultClientInputs, defaultScenarios, defaultAbsenteeismInputs, absenteeismBenchmarks } from '@/data/defaults';
 import { conditionBenchmarks, costBenchmarks, getCostBenchmark } from '@/data/benchmarks';
 import { calculateAllConditions } from '@/lib/engine/population';
 import { calculateFinancialBurden, calculateScenario } from '@/lib/engine/financial';
+import { calculateAbsenteeism, calculateTreatedVsUntreated } from '@/lib/engine/absenteeism';
 
 // ============================================================
 // State & Actions
@@ -22,12 +26,14 @@ import { calculateFinancialBurden, calculateScenario } from '@/lib/engine/financ
 interface CalculatorState {
   clientInputs: ClientInputs;
   scenarios: ScenarioSet;
+  absenteeismInputs: AbsenteeismInputs;
   activeTab: string;
 }
 
 type Action =
   | { type: 'UPDATE_CLIENT_INPUTS'; payload: Partial<ClientInputs> }
   | { type: 'UPDATE_SCENARIO'; scenarioType: ScenarioType; payload: Partial<ScenarioAssumptions> }
+  | { type: 'UPDATE_ABSENTEEISM_INPUTS'; payload: Partial<AbsenteeismInputs> }
   | { type: 'SET_ACTIVE_TAB'; payload: string }
   | { type: 'RESET_DEFAULTS' };
 
@@ -49,6 +55,11 @@ function reducer(state: CalculatorState, action: Action): CalculatorState {
           },
         },
       };
+    case 'UPDATE_ABSENTEEISM_INPUTS':
+      return {
+        ...state,
+        absenteeismInputs: { ...state.absenteeismInputs, ...action.payload },
+      };
     case 'SET_ACTIVE_TAB':
       return { ...state, activeTab: action.payload };
     case 'RESET_DEFAULTS':
@@ -59,6 +70,7 @@ function reducer(state: CalculatorState, action: Action): CalculatorState {
           base: { ...defaultScenarios.base },
           optimistic: { ...defaultScenarios.optimistic },
         },
+        absenteeismInputs: { ...defaultAbsenteeismInputs },
         activeTab: state.activeTab,
       };
     default:
@@ -74,11 +86,13 @@ interface DerivedData {
   populationResults: ConditionPopulationResult[];
   financialResults: ConditionFinancialResult[];
   scenarioResults: Record<ScenarioType, ScenarioResult[]>;
+  absenteeismResult: AbsenteeismResult;
+  treatedVsUntreatedResults: TreatedVsUntreatedCost[];
   adultMembers: number;
 }
 
 function computeDerived(state: CalculatorState): DerivedData {
-  const { clientInputs, scenarios } = state;
+  const { clientInputs, scenarios, absenteeismInputs } = state;
   const adultMembers = clientInputs.totalCoveredMembers * clientInputs.adultPercentage;
 
   const populationResults = calculateAllConditions(conditionBenchmarks, clientInputs);
@@ -103,7 +117,19 @@ function computeDerived(state: CalculatorState): DerivedData {
     );
   }
 
-  return { populationResults, financialResults, scenarioResults, adultMembers };
+  // Absenteeism & productivity
+  const absenteeismResult = calculateAbsenteeism(
+    populationResults, absenteeismInputs, absenteeismBenchmarks
+  );
+
+  const treatedVsUntreatedResults = populationResults.map((pr) =>
+    calculateTreatedVsUntreated(pr, absenteeismInputs, absenteeismBenchmarks)
+  );
+
+  return {
+    populationResults, financialResults, scenarioResults,
+    absenteeismResult, treatedVsUntreatedResults, adultMembers,
+  };
 }
 
 // ============================================================
@@ -115,6 +141,7 @@ interface CalculatorContextValue {
   derived: DerivedData;
   updateClientInputs: (inputs: Partial<ClientInputs>) => void;
   updateScenario: (scenarioType: ScenarioType, assumptions: Partial<ScenarioAssumptions>) => void;
+  updateAbsenteeismInputs: (inputs: Partial<AbsenteeismInputs>) => void;
   setActiveTab: (tab: string) => void;
   resetDefaults: () => void;
 }
@@ -129,6 +156,7 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
       base: { ...defaultScenarios.base },
       optimistic: { ...defaultScenarios.optimistic },
     },
+    absenteeismInputs: { ...defaultAbsenteeismInputs },
     activeTab: 'population',
   });
 
@@ -145,6 +173,12 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
     []
   );
 
+  const updateAbsenteeismInputs = useCallback(
+    (inputs: Partial<AbsenteeismInputs>) =>
+      dispatch({ type: 'UPDATE_ABSENTEEISM_INPUTS', payload: inputs }),
+    []
+  );
+
   const setActiveTab = useCallback(
     (tab: string) => dispatch({ type: 'SET_ACTIVE_TAB', payload: tab }),
     []
@@ -156,8 +190,11 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
   );
 
   const value = useMemo(
-    () => ({ state, derived, updateClientInputs, updateScenario, setActiveTab, resetDefaults }),
-    [state, derived, updateClientInputs, updateScenario, setActiveTab, resetDefaults]
+    () => ({
+      state, derived, updateClientInputs, updateScenario,
+      updateAbsenteeismInputs, setActiveTab, resetDefaults,
+    }),
+    [state, derived, updateClientInputs, updateScenario, updateAbsenteeismInputs, setActiveTab, resetDefaults]
   );
 
   return (

@@ -6,6 +6,7 @@ import { Navigation } from './navigation';
 import { PopulationOverview } from '@/components/sections/population-overview';
 import { ComorbidityAnalysis } from '@/components/sections/comorbidity-analysis';
 import { FinancialImpact } from '@/components/sections/financial-impact';
+import { Absenteeism } from '@/components/sections/absenteeism';
 import { ExecutiveSummary } from '@/components/sections/executive-summary';
 import { Methodology } from '@/components/sections/methodology';
 
@@ -13,6 +14,7 @@ const sections: Record<string, React.ComponentType> = {
   population: PopulationOverview,
   comorbidity: ComorbidityAnalysis,
   financial: FinancialImpact,
+  absenteeism: Absenteeism,
   summary: ExecutiveSummary,
   methodology: Methodology,
 };

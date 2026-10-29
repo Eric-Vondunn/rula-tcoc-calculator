@@ -6,6 +6,7 @@ import {
   Users,
   Activity,
   DollarSign,
+  Clock,
   FileText,
   BookOpen,
 } from 'lucide-react';
@@ -14,6 +15,7 @@ const navItems = [
   { id: 'population', label: 'Population Overview', icon: Users },
   { id: 'comorbidity', label: 'Comorbidity Analysis', icon: Activity },
   { id: 'financial', label: 'Financial Impact', icon: DollarSign },
+  { id: 'absenteeism', label: 'Absenteeism & Productivity', icon: Clock },
   { id: 'summary', label: 'Executive Summary', icon: FileText },
   { id: 'methodology', label: 'Research & Methodology', icon: BookOpen },
 ];

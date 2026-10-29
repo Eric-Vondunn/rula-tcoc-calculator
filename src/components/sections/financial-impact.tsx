@@ -8,7 +8,7 @@ import { Disclaimer } from '@/components/shared/disclaimer';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { formatNumber, formatCurrency } from '@/lib/utils';
 import { OVERLAP_DISCLAIMER, UNVERIFIED_COST_DISCLAIMER } from '@/data/defaults';
-import { DollarSign, AlertTriangle } from 'lucide-react';
+import { DollarSign, AlertTriangle, TrendingDown, TrendingUp } from 'lucide-react';
 import {
   BarChart,
   Bar,
@@ -25,7 +25,7 @@ const COLORS = ['#0d9488', '#0891b2', '#6366f1', '#d97706', '#059669', '#94a3b8'
 export function FinancialImpact() {
   const { state, derived, updateClientInputs } = useCalculator();
   const { clientInputs } = state;
-  const { financialResults } = derived;
+  const { financialResults, treatedVsUntreatedResults } = derived;
 
   // Aggregate totals
   const totalUntreated = financialResults.reduce(
@@ -133,6 +133,166 @@ export function FinancialImpact() {
                 <p className="text-sm text-gray-400 italic">Set recoverable % to calculate</p>
               )}
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Treated vs Untreated Cost Comparison */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingDown className="h-5 w-5 text-teal-600" />
+            Treated vs Untreated: Per-Person Annual Cost
+          </CardTitle>
+          <CardDescription>
+            Per-person annual cost breakdown comparing untreated behavioral health comorbidity vs treatment
+            through Rula. Includes medical claims, absenteeism, and short-term disability components.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-3 font-medium text-gray-500" rowSpan={2}>Cost Component</th>
+                  <th className="text-center py-2 px-3 font-medium text-red-600 border-b border-red-100" colSpan={1}>Untreated</th>
+                  <th className="text-center py-2 px-3 font-medium text-teal-600 border-b border-teal-100" colSpan={1}>Treated (with Rula)</th>
+                  <th className="text-center py-2 px-3 font-medium text-gray-500" rowSpan={2}>Savings</th>
+                </tr>
+              </thead>
+              <tbody>
+                {treatedVsUntreatedResults.length > 0 && (() => {
+                  // Use first condition as representative per-person costs (benchmarks are the same across conditions)
+                  const r = treatedVsUntreatedResults[0];
+                  const rows = [
+                    {
+                      label: 'Incremental Medical Claims',
+                      untreated: r.untreatedMedicalClaims,
+                      treated: r.treatedMedicalClaims,
+                    },
+                    {
+                      label: 'Absenteeism / Productivity Loss',
+                      untreated: r.untreatedAbsenteeismCost,
+                      treated: r.treatedAbsenteeismCost,
+                    },
+                    {
+                      label: 'Short-Term Disability',
+                      untreated: r.untreatedStdCost,
+                      treated: r.treatedStdCost,
+                    },
+                  ];
+                  const untreatedTotal = r.untreatedTotalCost;
+                  const treatedTotal = r.treatedTotalCost;
+
+                  return (
+                    <>
+                      {rows.map((row) => (
+                        <tr key={row.label} className="border-b border-gray-100">
+                          <td className="py-3 px-3 text-gray-700">{row.label}</td>
+                          <td className="py-3 px-3 text-right text-red-700 font-medium">
+                            {formatCurrency(row.untreated)}
+                          </td>
+                          <td className="py-3 px-3 text-right text-teal-700 font-medium">
+                            {formatCurrency(row.treated)}
+                          </td>
+                          <td className="py-3 px-3 text-right text-green-700 font-medium">
+                            {formatCurrency(row.untreated - row.treated)}
+                          </td>
+                        </tr>
+                      ))}
+                      <tr className="border-b border-gray-100">
+                        <td className="py-3 px-3 text-gray-700">Rula Treatment Cost</td>
+                        <td className="py-3 px-3 text-right text-gray-400">—</td>
+                        <td className="py-3 px-3 text-right text-teal-700 font-medium">
+                          {formatCurrency(r.rulaTreatmentCost)}
+                        </td>
+                        <td className="py-3 px-3 text-right text-gray-400">—</td>
+                      </tr>
+                      <tr className="border-t-2 border-gray-300 bg-gray-50">
+                        <td className="py-3 px-3 font-bold text-gray-900">Total Per Person / Year</td>
+                        <td className="py-3 px-3 text-right font-bold text-red-700">
+                          {formatCurrency(untreatedTotal)}
+                        </td>
+                        <td className="py-3 px-3 text-right font-bold text-teal-700">
+                          {formatCurrency(treatedTotal)}
+                        </td>
+                        <td className="py-3 px-3 text-right font-bold text-green-700">
+                          {formatCurrency(r.annualSavingsPerPerson)}
+                        </td>
+                      </tr>
+                    </>
+                  );
+                })()}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-gray-500 mt-3">
+            All per-person costs are incremental (above baseline for individuals without behavioral health conditions).
+            Rula treatment cost: $130/session × 10 avg sessions = $1,300 per person.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Population-Level Savings by Condition */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-green-600" />
+            Population-Level Savings Opportunity
+          </CardTitle>
+          <CardDescription>
+            Projected annual savings per condition if untreated individuals received Rula behavioral health treatment.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-3 font-medium text-gray-500">Condition</th>
+                  <th className="text-right py-3 px-3 font-medium text-gray-500">Untreated Pop.</th>
+                  <th className="text-right py-3 px-3 font-medium text-gray-500">Savings/Person</th>
+                  <th className="text-right py-3 px-3 font-medium text-gray-500">Total Savings</th>
+                </tr>
+              </thead>
+              <tbody>
+                {treatedVsUntreatedResults.map((r) => (
+                  <tr key={r.conditionId} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="py-3 px-3 font-medium text-gray-900">{r.conditionName}</td>
+                    <td className="py-3 px-3 text-right text-gray-700">
+                      {r.untreatedPopulation !== null
+                        ? formatNumber(r.untreatedPopulation)
+                        : <span className="text-gray-400 italic">N/A</span>}
+                    </td>
+                    <td className="py-3 px-3 text-right text-green-700 font-medium">
+                      {formatCurrency(r.annualSavingsPerPerson)}
+                    </td>
+                    <td className="py-3 px-3 text-right font-semibold text-green-700">
+                      {r.populationSavings !== null
+                        ? formatCurrency(r.populationSavings)
+                        : <span className="text-gray-400 italic">N/A</span>}
+                    </td>
+                  </tr>
+                ))}
+                <tr className="border-t-2 border-gray-300 bg-gray-50">
+                  <td className="py-3 px-3 font-bold text-gray-900">
+                    Combined Total
+                    <span className="block text-xs font-normal text-amber-700">Includes overlap</span>
+                  </td>
+                  <td className="py-3 px-3 text-right font-bold text-gray-900">
+                    {formatNumber(treatedVsUntreatedResults.reduce(
+                      (sum, r) => sum + (r.untreatedPopulation ?? 0), 0
+                    ))}
+                  </td>
+                  <td className="py-3 px-3 text-right text-gray-400">—</td>
+                  <td className="py-3 px-3 text-right font-bold text-green-700">
+                    {formatCurrency(treatedVsUntreatedResults.reduce(
+                      (sum, r) => sum + (r.populationSavings ?? 0), 0
+                    ))}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </CardContent>
       </Card>
