@@ -11,6 +11,7 @@ import { OVERLAP_DISCLAIMER, FINANCIAL_DISCLAIMER } from '@/data/defaults';
 import { conditionBenchmarks } from '@/data/benchmarks';
 import { computeModel, computePlan, rateOf, ppl, usd, pct, longDate, parseYmd, schedule } from '@/components/sections/mutual-action-plan/calculations';
 import { TAC, MOM, MONTHS, ADDONS, CH } from '@/components/sections/mutual-action-plan/constants';
+import { FollowUpEmail } from '@/components/sections/follow-up-email';
 
 export function ExecutiveSummary() {
   const { state, derived } = useCalculator();
@@ -723,6 +724,45 @@ export function ExecutiveSummary() {
           })()}
         </CardContent>
       </Card>
+
+      {/* Follow-Up Email Generator */}
+      <div className="no-print">
+        <FollowUpEmail
+          clientName={clientName}
+          totalCoveredMembers={clientInputs.totalCoveredMembers}
+          analysisYear={clientInputs.analysisYear}
+          adultMembers={adultMembers}
+          totalWithCondition={totalWithCondition}
+          totalWithBhComorbidity={totalWithBhComorbidity}
+          totalUntreated={totalUntreated}
+          totalModeledSpending={totalModeledSpending}
+          totalNetSavingsAllComponents={totalNetSavingsAllComponents}
+          totalMedicalSavings={totalMedicalSavings}
+          totalAbsenteeismSavings={totalAbsenteeismSavings}
+          totalStdSavings={totalStdSavings}
+          totalGrossSavingsAllComponents={totalGrossSavingsAllComponents}
+          totalRulaCost={totalRulaCost}
+          totalUntreatedPopulation={absenteeismResult.totalUntreatedPopulation}
+          missedDaysChronicUntreated={absenteeismResult.missedDaysChronicUntreated}
+          annualSavingsPerPerson={
+            treatedVsUntreatedResults.length > 0
+              ? treatedVsUntreatedResults[0].annualSavingsPerPerson
+              : 0
+          }
+          headcount={mapState.headcount}
+          projectedCareStarts={projectedCareStarts}
+          projectedCostAddressed={projectedCostAddressed}
+          engagementMultiplier={mapPlan.mult}
+          selectedChannelCount={mapPlan.chan}
+          selectedChannelNames={TAC.filter((t) => mapState.channelSelections[t.id]).map((t) => t.t)}
+          quarterDates={MOM.map((m, i) => ({
+            quarter: m.q,
+            moment: m.t,
+            date: parseYmd(mapState.dates[i]),
+            confirmed: mapState.confirmed[i],
+          }))}
+        />
+      </div>
 
       {/* Key Assumptions */}
       <Card className="print-break-before">
