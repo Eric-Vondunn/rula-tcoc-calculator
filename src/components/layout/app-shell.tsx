@@ -8,6 +8,7 @@ import { ComorbidityAnalysis } from '@/components/sections/comorbidity-analysis'
 import { FinancialImpact } from '@/components/sections/financial-impact';
 import { Absenteeism } from '@/components/sections/absenteeism';
 import { ExecutiveSummary } from '@/components/sections/executive-summary';
+import { MutualActionPlan } from '@/components/sections/mutual-action-plan';
 import { Methodology } from '@/components/sections/methodology';
 
 const sections: Record<string, React.ComponentType> = {
@@ -16,6 +17,7 @@ const sections: Record<string, React.ComponentType> = {
   financial: FinancialImpact,
   absenteeism: Absenteeism,
   summary: ExecutiveSummary,
+  'action-plan': MutualActionPlan,
   methodology: Methodology,
 };
 

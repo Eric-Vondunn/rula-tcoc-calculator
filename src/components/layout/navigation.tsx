@@ -9,6 +9,7 @@ import {
   Clock,
   FileText,
   BookOpen,
+  Handshake,
 } from 'lucide-react';
 
 const navItems = [
@@ -17,6 +18,7 @@ const navItems = [
   { id: 'financial', label: 'Financial Impact', icon: DollarSign },
   { id: 'absenteeism', label: 'Absenteeism & Productivity', icon: Clock },
   { id: 'summary', label: 'Executive Summary', icon: FileText },
+  { id: 'action-plan', label: 'Mutual Action Plan', icon: Handshake },
   { id: 'methodology', label: 'Research & Methodology', icon: BookOpen },
 ];
 
