@@ -13,6 +13,7 @@ import type {
   AbsenteeismResult,
   TreatedVsUntreatedCost,
 } from '@/types';
+import type { MapState, MapAction } from '@/components/sections/mutual-action-plan/types';
 import { defaultClientInputs, defaultScenarios, defaultAbsenteeismInputs, absenteeismBenchmarks } from '@/data/defaults';
 import { conditionBenchmarks, costBenchmarks, getCostBenchmark } from '@/data/benchmarks';
 import { calculateAllConditions } from '@/lib/engine/population';
@@ -23,11 +24,26 @@ import { calculateAbsenteeism, calculateTreatedVsUntreated } from '@/lib/engine/
 // State & Actions
 // ============================================================
 
+const defaultMapState: MapState = {
+  employerName: '[Employer Name]',
+  headcount: 1000,
+  activeView: 'v1',
+  channelSelections: { t_email: true },
+  monthSelections: {},
+  addonSelections: {},
+  dates: ['', '', '', ''],
+  confirmed: [false, false, false, false],
+  priorities: [{ k: '', n: '' }, { k: '', n: '' }, { k: '', n: '' }],
+  openQuarter: null,
+  otherText: '',
+};
+
 interface CalculatorState {
   clientInputs: ClientInputs;
   scenarios: ScenarioSet;
   absenteeismInputs: AbsenteeismInputs;
   activeTab: string;
+  mapState: MapState;
 }
 
 type Action =
@@ -35,7 +51,55 @@ type Action =
   | { type: 'UPDATE_SCENARIO'; scenarioType: ScenarioType; payload: Partial<ScenarioAssumptions> }
   | { type: 'UPDATE_ABSENTEEISM_INPUTS'; payload: Partial<AbsenteeismInputs> }
   | { type: 'SET_ACTIVE_TAB'; payload: string }
+  | { type: 'MAP_ACTION'; payload: MapAction }
   | { type: 'RESET_DEFAULTS' };
+
+function reduceMapAction(state: MapState, action: MapAction): MapState {
+  switch (action.type) {
+    case 'SET_EMPLOYER_NAME':
+      return { ...state, employerName: action.value };
+    case 'SET_HEADCOUNT':
+      return { ...state, headcount: action.value };
+    case 'SET_ACTIVE_VIEW':
+      return { ...state, activeView: action.value };
+    case 'TOGGLE_CHANNEL':
+      return { ...state, channelSelections: { ...state.channelSelections, [action.id]: !state.channelSelections[action.id] } };
+    case 'TOGGLE_MONTH':
+      return { ...state, monthSelections: { ...state.monthSelections, [action.id]: !state.monthSelections[action.id] } };
+    case 'TOGGLE_ADDON':
+      return { ...state, addonSelections: { ...state.addonSelections, [action.id]: !state.addonSelections[action.id] } };
+    case 'SET_DATE': {
+      const dates = [...state.dates] as [string, string, string, string];
+      dates[action.quarter] = action.value;
+      return { ...state, dates, openQuarter: action.quarter };
+    }
+    case 'SET_ALL_DATES':
+      return { ...state, dates: action.dates };
+    case 'TOGGLE_CONFIRMED': {
+      const confirmed = [...state.confirmed] as [boolean, boolean, boolean, boolean];
+      confirmed[action.quarter] = !confirmed[action.quarter];
+      return { ...state, confirmed };
+    }
+    case 'SET_PRIORITY_KEY': {
+      const priorities = [...state.priorities] as [typeof state.priorities[0], typeof state.priorities[1], typeof state.priorities[2]];
+      priorities[action.index] = { ...priorities[action.index], k: action.value };
+      return { ...state, priorities };
+    }
+    case 'SET_PRIORITY_NOTE': {
+      const priorities = [...state.priorities] as [typeof state.priorities[0], typeof state.priorities[1], typeof state.priorities[2]];
+      priorities[action.index] = { ...priorities[action.index], n: action.value };
+      return { ...state, priorities };
+    }
+    case 'SET_OPEN_QUARTER':
+      return { ...state, openQuarter: action.value };
+    case 'SET_OTHER_TEXT':
+      return { ...state, otherText: action.value };
+    case 'RESET':
+      return { ...defaultMapState };
+    default:
+      return state;
+  }
+}
 
 function reducer(state: CalculatorState, action: Action): CalculatorState {
   switch (action.type) {
@@ -62,6 +126,8 @@ function reducer(state: CalculatorState, action: Action): CalculatorState {
       };
     case 'SET_ACTIVE_TAB':
       return { ...state, activeTab: action.payload };
+    case 'MAP_ACTION':
+      return { ...state, mapState: reduceMapAction(state.mapState, action.payload) };
     case 'RESET_DEFAULTS':
       return {
         clientInputs: { ...defaultClientInputs },
@@ -72,6 +138,7 @@ function reducer(state: CalculatorState, action: Action): CalculatorState {
         },
         absenteeismInputs: { ...defaultAbsenteeismInputs },
         activeTab: state.activeTab,
+        mapState: state.mapState,
       };
     default:
       return state;
@@ -143,6 +210,7 @@ interface CalculatorContextValue {
   updateScenario: (scenarioType: ScenarioType, assumptions: Partial<ScenarioAssumptions>) => void;
   updateAbsenteeismInputs: (inputs: Partial<AbsenteeismInputs>) => void;
   setActiveTab: (tab: string) => void;
+  mapDispatch: (action: MapAction) => void;
   resetDefaults: () => void;
 }
 
@@ -158,6 +226,7 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
     },
     absenteeismInputs: { ...defaultAbsenteeismInputs },
     activeTab: 'population',
+    mapState: { ...defaultMapState },
   });
 
   const derived = useMemo(() => computeDerived(state), [state]);
@@ -184,6 +253,11 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
     []
   );
 
+  const mapDispatch = useCallback(
+    (action: MapAction) => dispatch({ type: 'MAP_ACTION', payload: action }),
+    []
+  );
+
   const resetDefaults = useCallback(
     () => dispatch({ type: 'RESET_DEFAULTS' }),
     []
@@ -192,9 +266,9 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
   const value = useMemo(
     () => ({
       state, derived, updateClientInputs, updateScenario,
-      updateAbsenteeismInputs, setActiveTab, resetDefaults,
+      updateAbsenteeismInputs, setActiveTab, mapDispatch, resetDefaults,
     }),
-    [state, derived, updateClientInputs, updateScenario, updateAbsenteeismInputs, setActiveTab, resetDefaults]
+    [state, derived, updateClientInputs, updateScenario, updateAbsenteeismInputs, setActiveTab, mapDispatch, resetDefaults]
   );
 
   return (

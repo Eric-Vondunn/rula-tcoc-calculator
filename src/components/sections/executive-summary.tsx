@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useCalculator } from '@/hooks/use-calculator';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -8,14 +9,22 @@ import { Disclaimer } from '@/components/shared/disclaimer';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/utils';
 import { OVERLAP_DISCLAIMER, FINANCIAL_DISCLAIMER } from '@/data/defaults';
 import { conditionBenchmarks } from '@/data/benchmarks';
+import { computeModel, computePlan, rateOf, ppl, usd, pct, longDate, parseYmd, schedule } from '@/components/sections/mutual-action-plan/calculations';
+import { TAC, MOM, MONTHS, ADDONS, CH } from '@/components/sections/mutual-action-plan/constants';
 
 export function ExecutiveSummary() {
   const { state, derived } = useCalculator();
-  const { clientInputs, absenteeismInputs } = state;
+  const { clientInputs, absenteeismInputs, mapState } = state;
   const {
     populationResults, financialResults, scenarioResults, adultMembers,
     absenteeismResult, treatedVsUntreatedResults,
   } = derived;
+
+  // Engagement plan projections
+  const mapModel = useMemo(() => computeModel(mapState.headcount), [mapState.headcount]);
+  const mapPlan = useMemo(() => computePlan(mapState), [mapState]);
+  const projectedCareStarts = Math.ceil(mapState.headcount * rateOf(mapPlan.mult));
+  const projectedCostAddressed = projectedCareStarts * 9450;
 
   const clientName = clientInputs.clientName || 'Employer';
   const availableConditions = populationResults.filter((r) => r.dataAvailable);
@@ -96,7 +105,7 @@ export function ExecutiveSummary() {
               Prepared for{' '}
               <span className="font-semibold text-gray-900">{clientName}</span>
             </p>
-            <div className="flex flex-wrap gap-4 mt-4 text-sm text-gray-500">
+            <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-gray-500">
               <span>
                 Covered Members:{' '}
                 <span className="font-semibold text-gray-900">
@@ -117,6 +126,13 @@ export function ExecutiveSummary() {
                   })}
                 </span>
               </span>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="no-print ml-auto inline-flex items-center rounded-full bg-teal-700 text-white px-5 py-2.5 text-sm font-medium hover:bg-teal-800 transition-colors"
+              >
+                Download PDF
+              </button>
             </div>
           </div>
         </CardContent>
@@ -539,8 +555,177 @@ export function ExecutiveSummary() {
         </CardContent>
       </Card>
 
+      {/* Proposed Rula Engagement Plan */}
+      <Card className="border-teal-200 print-break-before">
+        <CardHeader>
+          <CardTitle>Proposed Rula Engagement Plan</CardTitle>
+          <p className="text-sm text-gray-500 mt-1">
+            Engagement channels and quarterly campaign plan configured for {mapState.employerName}.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Projected Impact */}
+          <div>
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Projected Impact</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-1">
+                <p className="text-sm text-gray-500">Benefits-eligible employees</p>
+                <p className="text-2xl font-bold text-gray-900">{mapState.headcount.toLocaleString('en-US')}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-gray-500">Projected care starts</p>
+                <p className="text-2xl font-bold text-teal-700">{ppl(projectedCareStarts)}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-gray-500">Annual cost exposure addressed</p>
+                <p className="text-2xl font-bold text-teal-700">{usd(projectedCostAddressed)}</p>
+              </div>
+            </div>
+            <p className="mt-2 text-xs text-gray-400">
+              Engagement multiplier: {mapPlan.mult.toFixed(2)}x vs employer communications alone.{' '}
+              {mapPlan.chan} channel{mapPlan.chan !== 1 ? 's' : ''} selected.
+            </p>
+          </div>
+
+          <Separator />
+
+          {/* Selected Channels */}
+          <div>
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Selected Channels</p>
+            {(() => {
+              const selectedChannels = TAC.filter((t) => mapState.channelSelections[t.id]);
+              return selectedChannels.length > 0 ? (
+                <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
+                  {selectedChannels.map((t) => (
+                    <li key={t.id}>{t.t}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-gray-400 italic">No channels selected yet. Configure on the Rula Engagement Plan tab.</p>
+              );
+            })()}
+          </div>
+
+          <Separator />
+
+          {/* Quarterly Campaign Plan */}
+          <div>
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Quarterly Campaign Plan</p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left py-2 px-3 font-medium text-gray-500">Quarter</th>
+                    <th className="text-left py-2 px-3 font-medium text-gray-500">Moment</th>
+                    <th className="text-left py-2 px-3 font-medium text-gray-500">Launch Date</th>
+                    <th className="text-left py-2 px-3 font-medium text-gray-500">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {MOM.map((m, i) => {
+                    const dateStr = mapState.dates[i];
+                    const launchDate = parseYmd(dateStr);
+                    return (
+                      <tr key={i} className="border-b border-gray-100">
+                        <td className="py-2 px-3 font-medium text-gray-900">{m.q}</td>
+                        <td className="py-2 px-3 text-gray-700">{m.t}</td>
+                        <td className="py-2 px-3 text-gray-700">
+                          {launchDate ? longDate(launchDate) : <span className="text-gray-400 italic">Not set</span>}
+                        </td>
+                        <td className="py-2 px-3">
+                          {mapState.confirmed[i] ? (
+                            <span className="inline-flex items-center rounded-full bg-teal-100 px-2.5 py-0.5 text-xs font-medium text-teal-800">Confirmed</span>
+                          ) : dateStr ? (
+                            <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">Proposed</span>
+                          ) : (
+                            <span className="text-gray-400 text-xs">--</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Milestone Schedule for confirmed quarters */}
+          {mapState.dates.some((d) => d) && (
+            <>
+              <Separator />
+              <div>
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Key Milestones</p>
+                {MOM.map((m, i) => {
+                  const launchDate = parseYmd(mapState.dates[i]);
+                  if (!launchDate) return null;
+                  const sched = schedule(launchDate);
+                  return (
+                    <div key={i} className="mb-4">
+                      <p className="text-sm font-semibold text-gray-900 mb-1">{m.q}: {m.t}</p>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-xs">
+                          <tbody>
+                            {sched.map((s, si) => (
+                              <tr key={si} className="border-b border-gray-50">
+                                <td className="py-1 px-2 text-gray-500 w-28">{longDate(s.d)}</td>
+                                <td className="py-1 px-2 text-gray-700">{s.m.t}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {/* Monthly Moments */}
+          {(() => {
+            const selectedMonths: string[] = [];
+            MONTHS.forEach((mo, mi) => {
+              mo.items.forEach((it, ii) => {
+                if (mapState.monthSelections[`mo_${mi}_${ii}`]) {
+                  selectedMonths.push(`${mo.m}: ${it.t}`);
+                }
+              });
+            });
+            if (selectedMonths.length === 0) return null;
+            return (
+              <>
+                <Separator />
+                <div>
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Selected Monthly Moments</p>
+                  <ul className="list-disc list-inside space-y-0.5 text-sm text-gray-700">
+                    {selectedMonths.map((m, i) => <li key={i}>{m}</li>)}
+                  </ul>
+                </div>
+              </>
+            );
+          })()}
+
+          {/* Add-ons */}
+          {(() => {
+            const selectedAddons = ADDONS.filter((a) => mapState.addonSelections[a.id]);
+            if (selectedAddons.length === 0) return null;
+            return (
+              <>
+                <Separator />
+                <div>
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Add-ons</p>
+                  <ul className="list-disc list-inside space-y-0.5 text-sm text-gray-700">
+                    {selectedAddons.map((a) => <li key={a.id}>{a.t}</li>)}
+                  </ul>
+                </div>
+              </>
+            );
+          })()}
+        </CardContent>
+      </Card>
+
       {/* Key Assumptions */}
-      <Card>
+      <Card className="print-break-before">
         <CardHeader>
           <CardTitle>Key Assumptions & Limitations</CardTitle>
         </CardHeader>

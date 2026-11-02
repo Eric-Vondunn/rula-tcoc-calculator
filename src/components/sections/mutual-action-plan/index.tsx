@@ -1,81 +1,32 @@
 'use client';
 
-import { useReducer, useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useCalculator } from '@/hooks/use-calculator';
 import { AwarenessView } from './awareness-view';
 import { ActionPlanView } from './action-plan-view';
 import { computeModel, computePlan } from './calculations';
-import type { MapState, MapAction } from './types';
-
-const initialState: MapState = {
-  employerName: '[Employer Name]',
-  headcount: 1000,
-  activeView: 'v1',
-  channelSelections: { t_email: true },
-  monthSelections: {},
-  addonSelections: {},
-  dates: ['', '', '', ''],
-  confirmed: [false, false, false, false],
-  priorities: [{ k: '', n: '' }, { k: '', n: '' }, { k: '', n: '' }],
-  openQuarter: null,
-  otherText: '',
-};
-
-function mapReducer(state: MapState, action: MapAction): MapState {
-  switch (action.type) {
-    case 'SET_EMPLOYER_NAME':
-      return { ...state, employerName: action.value };
-    case 'SET_HEADCOUNT':
-      return { ...state, headcount: action.value };
-    case 'SET_ACTIVE_VIEW':
-      return { ...state, activeView: action.value };
-    case 'TOGGLE_CHANNEL':
-      return { ...state, channelSelections: { ...state.channelSelections, [action.id]: !state.channelSelections[action.id] } };
-    case 'TOGGLE_MONTH':
-      return { ...state, monthSelections: { ...state.monthSelections, [action.id]: !state.monthSelections[action.id] } };
-    case 'TOGGLE_ADDON':
-      return { ...state, addonSelections: { ...state.addonSelections, [action.id]: !state.addonSelections[action.id] } };
-    case 'SET_DATE': {
-      const dates = [...state.dates] as [string, string, string, string];
-      dates[action.quarter] = action.value;
-      return { ...state, dates, openQuarter: action.quarter };
-    }
-    case 'SET_ALL_DATES':
-      return { ...state, dates: action.dates };
-    case 'TOGGLE_CONFIRMED': {
-      const confirmed = [...state.confirmed] as [boolean, boolean, boolean, boolean];
-      confirmed[action.quarter] = !confirmed[action.quarter];
-      return { ...state, confirmed };
-    }
-    case 'SET_PRIORITY_KEY': {
-      const priorities = [...state.priorities] as [typeof state.priorities[0], typeof state.priorities[1], typeof state.priorities[2]];
-      priorities[action.index] = { ...priorities[action.index], k: action.value };
-      return { ...state, priorities };
-    }
-    case 'SET_PRIORITY_NOTE': {
-      const priorities = [...state.priorities] as [typeof state.priorities[0], typeof state.priorities[1], typeof state.priorities[2]];
-      priorities[action.index] = { ...priorities[action.index], n: action.value };
-      return { ...state, priorities };
-    }
-    case 'SET_OPEN_QUARTER':
-      return { ...state, openQuarter: action.value };
-    case 'SET_OTHER_TEXT':
-      return { ...state, otherText: action.value };
-    case 'RESET':
-      return { ...initialState };
-    default:
-      return state;
-  }
-}
 
 export function MutualActionPlan() {
-  const { state: calcState } = useCalculator();
-  const [state, dispatch] = useReducer(mapReducer, {
-    ...initialState,
-    employerName: calcState.clientInputs.clientName || '[Employer Name]',
-    headcount: Math.round(calcState.clientInputs.totalCoveredMembers * calcState.clientInputs.adultPercentage),
-  });
+  const { state: calcState, mapDispatch } = useCalculator();
+  const state = calcState.mapState;
+  const dispatch = mapDispatch;
+
+  // Sync employer name and headcount from calculator inputs on first mount
+  const didSync = useRef(false);
+  useEffect(() => {
+    if (!didSync.current) {
+      didSync.current = true;
+      const name = calcState.clientInputs.clientName || '[Employer Name]';
+      const heads = Math.round(calcState.clientInputs.totalCoveredMembers * calcState.clientInputs.adultPercentage);
+      if (state.employerName === '[Employer Name]') {
+        dispatch({ type: 'SET_EMPLOYER_NAME', value: name });
+      }
+      if (state.headcount === 1000) {
+        dispatch({ type: 'SET_HEADCOUNT', value: heads });
+      }
+    }
+  }, [calcState.clientInputs, state.employerName, state.headcount, dispatch]);
 
   const model = useMemo(() => computeModel(state.headcount), [state.headcount]);
   const plan = useMemo(() => computePlan(state), [state]);

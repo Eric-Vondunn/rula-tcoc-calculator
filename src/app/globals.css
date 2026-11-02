@@ -29,13 +29,101 @@ input[type="number"] {
   transition: box-shadow 0.15s ease;
 }
 
-/* Print styles for executive summary */
+/* Print styles for executive summary PDF */
 @media print {
-  nav, header button, footer {
+  /* Hide app chrome and interactive elements */
+  nav, footer, .no-print {
     display: none !important;
   }
 
-  .shadow-sm {
+  /* Page setup */
+  @page {
+    margin: 0.75in;
+    size: letter;
+  }
+
+  body {
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  main {
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Page break helpers */
+  .print-break-before {
+    page-break-before: always;
+  }
+
+  .print-break-avoid {
+    page-break-inside: avoid;
+  }
+
+  /* Clean card appearance */
+  .shadow-sm, .shadow, .shadow-md, .shadow-lg {
     box-shadow: none !important;
+  }
+
+  /* Ensure borders print */
+  [class*="border"] {
+    border-color: #e5e7eb !important;
+  }
+
+  [class*="border-teal"] {
+    border-color: #99f6e4 !important;
+  }
+
+  /* Table formatting */
+  table {
+    font-size: 11px !important;
+    page-break-inside: avoid;
+  }
+
+  th, td {
+    padding: 4px 6px !important;
+  }
+
+  /* Card sections avoid breaks */
+  [class*="CardContent"], [class*="CardHeader"] {
+    page-break-inside: avoid;
+  }
+
+  /* Hide interactive controls but keep static text */
+  input, select, textarea {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  input[type="text"], input[type="number"] {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  /* Keep gradient backgrounds for header card */
+  [class*="bg-gradient"] {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Teal badge backgrounds */
+  [class*="bg-teal"], [class*="bg-amber"], [class*="bg-emerald"] {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Typography */
+  h2, h3, h4 {
+    page-break-after: avoid;
+  }
+
+  p {
+    orphans: 3;
+    widows: 3;
   }
 }
