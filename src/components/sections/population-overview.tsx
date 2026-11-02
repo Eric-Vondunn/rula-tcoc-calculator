@@ -6,6 +6,7 @@ import { MetricCard } from '@/components/shared/metric-card';
 import { NumberInput } from '@/components/shared/number-input';
 import { Disclaimer } from '@/components/shared/disclaimer';
 import { formatNumber } from '@/lib/utils';
+import { InfoTip } from '@/components/shared/info-tip';
 import { Users, UserCheck, Heart } from 'lucide-react';
 import {
   BarChart,
@@ -108,6 +109,7 @@ export function PopulationOverview() {
         <MetricCard
           label="Total Covered Members"
           value={formatNumber(clientInputs.totalCoveredMembers)}
+          tooltip="User input: total employees and covered dependents."
           icon={Users}
           iconColor="text-teal-600"
         />
@@ -115,6 +117,7 @@ export function PopulationOverview() {
           label="Estimated Adult Members"
           value={formatNumber(adultMembers)}
           subtitle={`${(clientInputs.adultPercentage * 100).toFixed(0)}% of total`}
+          tooltip="Total covered members × adult percentage (default 78%, industry benchmark)."
           icon={UserCheck}
           iconColor="text-cyan-600"
         />
@@ -122,6 +125,7 @@ export function PopulationOverview() {
           label="Conditions Evaluated"
           value={populationResults.filter((r) => r.dataAvailable).length.toString()}
           subtitle={`of ${populationResults.length} categories`}
+          tooltip="Count of conditions where both prevalence and BH comorbidity benchmarks are available."
           icon={Heart}
           iconColor="text-indigo-600"
         />
@@ -138,15 +142,15 @@ export function PopulationOverview() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Total Est. With Chronic Conditions</p>
+              <p className="text-sm text-gray-500">Total Est. With Chronic Conditions<InfoTip>Sum of (eligible population × prevalence rate) for each condition. Includes overlap across categories.</InfoTip></p>
               <p className="text-2xl font-bold text-gray-900 tracking-tight">{formatNumber(totalWithCondition)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Total Est. With BH Comorbidity</p>
+              <p className="text-sm text-gray-500">Total Est. With BH Comorbidity<InfoTip>Sum of (est. with condition × BH comorbidity rate) per condition. Rates: 20–25% by condition (Anderson 2001, Lichtman 2014, Mitchell 2011).</InfoTip></p>
               <p className="text-2xl font-bold text-gray-900 tracking-tight">{formatNumber(totalWithBhComorbidity)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Total Est. Untreated BH</p>
+              <p className="text-sm text-gray-500">Total Est. Untreated BH<InfoTip>Sum of (BH comorbidity × untreated rate). Untreated rate: ~57% (NIMH/NSDUH general population estimate).</InfoTip></p>
               <p className="text-2xl font-bold text-teal-700 tracking-tight">{formatNumber(totalUntreated)}</p>
             </div>
           </div>
@@ -216,9 +220,9 @@ export function PopulationOverview() {
               <thead>
                 <tr className="border-b border-gray-200">
                   <th className="text-left py-3 px-4 font-medium text-gray-500">Condition</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-500">Prevalence</th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-500">Prevalence<InfoTip>National prevalence benchmark. Sources: CDC, AHA, ACS by condition.</InfoTip></th>
                   <th className="text-right py-3 px-4 font-medium text-gray-500">Eligible Pop.</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-500">Est. Members</th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-500">Est. Members<InfoTip>Eligible population × prevalence rate.</InfoTip></th>
                   <th className="text-left py-3 px-4 font-medium text-gray-500">Denominator</th>
                 </tr>
               </thead>

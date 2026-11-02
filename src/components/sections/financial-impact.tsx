@@ -7,6 +7,7 @@ import { NumberInput } from '@/components/shared/number-input';
 import { Disclaimer } from '@/components/shared/disclaimer';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { formatNumber, formatCurrency } from '@/lib/utils';
+import { InfoTip } from '@/components/shared/info-tip';
 import { OVERLAP_DISCLAIMER, UNVERIFIED_COST_DISCLAIMER } from '@/data/defaults';
 import { DollarSign, AlertTriangle, TrendingDown, TrendingUp } from 'lucide-react';
 import {
@@ -134,15 +135,15 @@ export function FinancialImpact() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Total Untreated (All Conditions)</p>
+              <p className="text-sm text-gray-500">Total Untreated (All Conditions)<InfoTip>Sum of estimated untreated BH across all conditions. Includes overlap.</InfoTip></p>
               <p className="text-2xl font-bold text-gray-900 tracking-tight">{formatNumber(totalUntreated)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Total Modeled Annual Spending</p>
+              <p className="text-sm text-gray-500">Total Modeled Annual Spending<InfoTip>Untreated count × $10,000 annual incremental cost per person. Source: IBI (unverified).</InfoTip></p>
               <p className="text-2xl font-bold text-gray-900 tracking-tight">{formatCurrency(totalModeledSpending)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Total Potentially Avoidable</p>
+              <p className="text-sm text-gray-500">Total Potentially Avoidable<InfoTip>Modeled spending × recoverable cost percentage (user-configured).</InfoTip></p>
               {hasAvoidable ? (
                 <p className="text-2xl font-bold text-teal-700 tracking-tight">{formatCurrency(totalAvoidableSpending)}</p>
               ) : (
@@ -164,27 +165,27 @@ export function FinancialImpact() {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Medical Claims</p>
+              <p className="text-sm text-gray-500">Medical Claims<InfoTip>Population × ($5,000 untreated − $2,000 treated) per person per year.</InfoTip></p>
               <p className="text-xl font-bold text-green-700 tracking-tight">{formatCurrency(totalMedicalSavings)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Absenteeism</p>
+              <p className="text-sm text-gray-500">Absenteeism<InfoTip>Population × [(12 − 4 untreated days) − (7 − 4 treated days)] × daily cost. Sources: Loeppke 2009, BLS.</InfoTip></p>
               <p className="text-xl font-bold text-green-700 tracking-tight">{formatCurrency(totalAbsenteeismSavings)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Short-Term Disability</p>
+              <p className="text-sm text-gray-500">Short-Term Disability<InfoTip>Population × [$800 × 2.0x untreated − $800 × 1.3x treated] per person.</InfoTip></p>
               <p className="text-xl font-bold text-green-700 tracking-tight">{formatCurrency(totalStdSavings)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Gross Savings</p>
+              <p className="text-sm text-gray-500">Gross Savings<InfoTip>Medical claims + absenteeism + short-term disability savings combined.</InfoTip></p>
               <p className="text-xl font-bold text-green-700 tracking-tight">{formatCurrency(totalGrossSavings)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Rula Investment</p>
+              <p className="text-sm text-gray-500">Rula Investment<InfoTip>$130/session × 10 avg sessions = $1,300 per person × untreated population.</InfoTip></p>
               <p className="text-xl font-bold text-gray-900 tracking-tight">{formatCurrency(totalRulaCost)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Net Savings</p>
+              <p className="text-sm text-gray-500">Net Savings<InfoTip>Gross savings (medical + absenteeism + STD) minus Rula treatment investment.</InfoTip></p>
               <p className={`text-xl font-bold tracking-tight ${totalNetAllComponents >= 0 ? 'text-emerald-700' : 'text-red-600'}`}>
                 {formatCurrency(totalNetAllComponents)}
               </p>
@@ -223,16 +224,19 @@ export function FinancialImpact() {
                   const rows = [
                     {
                       label: 'Incremental Medical Claims',
+                      tip: '$5,000/yr untreated vs $2,000/yr treated (benchmark).',
                       untreated: r.untreatedMedicalClaims,
                       treated: r.treatedMedicalClaims,
                     },
                     {
                       label: 'Absenteeism / Productivity Loss',
+                      tip: '(Missed days − baseline 4 days) × daily cost. Untreated: 12 days (Loeppke 2009). Treated: 7 days.',
                       untreated: r.untreatedAbsenteeismCost,
                       treated: r.treatedAbsenteeismCost,
                     },
                     {
                       label: 'Short-Term Disability',
+                      tip: '$800 baseline × multiplier. Untreated: 2.0x. Treated: 1.3x.',
                       untreated: r.untreatedStdCost,
                       treated: r.treatedStdCost,
                     },
@@ -244,7 +248,7 @@ export function FinancialImpact() {
                     <>
                       {rows.map((row) => (
                         <tr key={row.label} className="border-b border-gray-100">
-                          <td className="py-3 px-3 text-gray-700">{row.label}</td>
+                          <td className="py-3 px-3 text-gray-700">{row.label}<InfoTip>{row.tip}</InfoTip></td>
                           <td className="py-3 px-3 text-right text-red-700 font-medium">
                             {formatCurrency(row.untreated)}
                           </td>
@@ -257,7 +261,7 @@ export function FinancialImpact() {
                         </tr>
                       ))}
                       <tr className="border-b border-gray-100">
-                        <td className="py-3 px-3 text-gray-700">Rula Treatment Cost</td>
+                        <td className="py-3 px-3 text-gray-700">Rula Treatment Cost<InfoTip>$130/session × 10 avg sessions = $1,300/person.</InfoTip></td>
                         <td className="py-3 px-3 text-right text-gray-400">—</td>
                         <td className="py-3 px-3 text-right text-teal-700 font-medium">
                           {formatCurrency(r.rulaTreatmentCost)}
@@ -307,8 +311,8 @@ export function FinancialImpact() {
                 <tr className="border-b border-gray-200">
                   <th className="text-left py-3 px-3 font-medium text-gray-500">Condition</th>
                   <th className="text-right py-3 px-3 font-medium text-gray-500">Untreated Pop.</th>
-                  <th className="text-right py-3 px-3 font-medium text-gray-500">Savings/Person</th>
-                  <th className="text-right py-3 px-3 font-medium text-gray-500">Total Savings</th>
+                  <th className="text-right py-3 px-3 font-medium text-gray-500">Savings/Person<InfoTip>Untreated total cost − treated total cost per person per year.</InfoTip></th>
+                  <th className="text-right py-3 px-3 font-medium text-gray-500">Total Savings<InfoTip>Per-person savings × untreated population. Includes overlap.</InfoTip></th>
                 </tr>
               </thead>
               <tbody>
@@ -412,10 +416,10 @@ export function FinancialImpact() {
               <thead>
                 <tr className="border-b border-gray-200">
                   <th className="text-left py-3 px-4 font-medium text-gray-500">Condition</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-500">Untreated Count</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-500">Cost/Person</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-500">Modeled Spending</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-500">Potentially Avoidable</th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-500">Untreated Count<InfoTip>Est. BH comorbidity × 57% untreated rate (NIMH/NSDUH).</InfoTip></th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-500">Cost/Person<InfoTip>$10,000 annual incremental cost per untreated individual. Source: IBI (unverified).</InfoTip></th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-500">Modeled Spending<InfoTip>Untreated count × $10,000 annual incremental cost.</InfoTip></th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-500">Potentially Avoidable<InfoTip>Modeled spending × recoverable cost percentage (user-configured).</InfoTip></th>
                 </tr>
               </thead>
               <tbody>

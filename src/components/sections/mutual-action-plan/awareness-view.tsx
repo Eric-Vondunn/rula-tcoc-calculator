@@ -1,6 +1,7 @@
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
+import { InfoTip } from '@/components/shared/info-tip';
 import { BM, A, CARE, BAR_DATA, MONEY_CARDS } from './constants';
 import { computePlan, rateOf, maxMult, ppl, pct, n0, usd, word, progOf } from './calculations';
 import type { ModelResult, MapState, MapAction, PlanResult } from './types';
@@ -37,16 +38,16 @@ export function AwarenessView({ model: m, plan: P, state, dispatch }: Props) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {[
-            { num: ppl(m.matters), label: 'say mental health matters at work', rate: '81%' },
-            { num: ppl(m.nondisc), label: 'keep their struggles private', rate: '43%' },
-            { num: ppl(m.cost), label: 'are blocked by cost, up from 25%', rate: '41%' },
-            { num: ppl(m.unsure), label: 'cannot name what kind of therapy they need', rate: '37%' },
+            { num: ppl(m.matters), label: 'say mental health matters at work', rate: '81%', tip: 'Headcount × 81%. Source: Rula 2026 State of Mental Health Report.' },
+            { num: ppl(m.nondisc), label: 'keep their struggles private', rate: '43%', tip: 'Headcount × 43%. Source: Rula 2026 State of Mental Health Report.' },
+            { num: ppl(m.cost), label: 'are blocked by cost, up from 25%', rate: '41%', tip: 'Headcount × 41%. Source: Rula 2026 State of Mental Health Report.' },
+            { num: ppl(m.unsure), label: 'cannot name what kind of therapy they need', rate: '37%', tip: 'Headcount × 37%. Source: Rula 2026 State of Mental Health Report.' },
           ].map((card) => (
             <Card key={card.rate} className="border-gray-200">
               <CardContent className="flex items-center gap-4 p-4">
                 <div>
                   <div className="text-2xl font-semibold text-teal-700">{card.num}</div>
-                  <div className="text-sm text-gray-700 mt-1">{card.label}</div>
+                  <div className="text-sm text-gray-700 mt-1">{card.label}<InfoTip>{card.tip}</InfoTip></div>
                   <div className="text-xs text-gray-400 mt-1">{card.rate} of workforce</div>
                 </div>
               </CardContent>
@@ -70,7 +71,7 @@ export function AwarenessView({ model: m, plan: P, state, dispatch }: Props) {
 
         <Card className="border-l-4 border-l-teal-600 mb-4">
           <CardContent className="p-5">
-            <div className="text-4xl font-semibold text-teal-700">{ppl(m.affected)}</div>
+            <div className="text-4xl font-semibold text-teal-700">{ppl(m.affected)}<InfoTip>43% non-disclosure × 60% with work impact × headcount.</InfoTip></div>
             <div className="text-base text-gray-700 mt-2">
               employees who keep their struggles private <strong className="text-gray-900">and</strong> whose work is affected. That&rsquo;s <strong className="text-gray-900">{ppl(m.miss6)}</strong> missing 6+ workdays a year, and <strong className="text-gray-900">{ppl(m.quitters)}</strong> who have considered quitting.
             </div>
@@ -106,14 +107,14 @@ export function AwarenessView({ model: m, plan: P, state, dispatch }: Props) {
         {/* Money cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
           {[
-            { num: ppl(m.affected), label: 'employees affected', sub: '43% non-disclosure × 60% affected' },
-            { num: n0(m.days), label: 'incremental workdays missed', sub: '6+ days each, the report threshold' },
-            { num: usd(m.total), label: 'in annual cost exposure', sub: '$9,450 per affected employee' },
+            { num: ppl(m.affected), label: 'employees affected', sub: '43% non-disclosure × 60% affected', tip: '43% non-disclosure × 60% with work impact × headcount.' },
+            { num: n0(m.days), label: 'incremental workdays missed', sub: '6+ days each, the report threshold', tip: 'Affected employees × (28% hide & miss 6+ days − 4% open & miss 6+ days) × 6 days.' },
+            { num: usd(m.total), label: 'in annual cost exposure', sub: '$9,450 per affected employee', tip: 'Affected employees × $9,450 per person.' },
           ].map((card) => (
             <Card key={card.label} className="border-gray-200">
               <CardContent className="p-4">
                 <div className="text-xl font-semibold text-gray-900">{card.num}</div>
-                <div className="text-xs text-gray-500 mt-2">{card.label}</div>
+                <div className="text-xs text-gray-500 mt-2">{card.label}<InfoTip>{card.tip}</InfoTip></div>
               </CardContent>
             </Card>
           ))}
@@ -145,7 +146,7 @@ export function AwarenessView({ model: m, plan: P, state, dispatch }: Props) {
             <div className="text-xs font-medium tracking-wider uppercase text-teal-300 mb-2">
               Over one plan year, all four quarters running
             </div>
-            <div className="text-5xl font-semibold">{ppl(newPeople)}</div>
+            <div className="text-5xl font-semibold">{ppl(newPeople)}<InfoTip>Headcount × engagement rate for selected channel mix.</InfoTip></div>
             <div className="text-sm text-gray-300 mt-2 max-w-[34ch]">
               <strong className="text-white">{word(newPeople)}</strong> projected to start care with Rula, addressing <strong className="text-white">{usd(newDollars)}</strong> of annual cost exposure.
             </div>

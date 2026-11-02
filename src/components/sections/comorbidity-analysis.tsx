@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { Disclaimer } from '@/components/shared/disclaimer';
 import { formatNumber, formatPercent } from '@/lib/utils';
+import { InfoTip } from '@/components/shared/info-tip';
 import { OVERLAP_DISCLAIMER } from '@/data/defaults';
 import {
   BarChart,
@@ -58,15 +59,15 @@ export function ComorbidityAnalysis() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Total With Chronic Conditions</p>
+              <p className="text-sm text-gray-500">Total With Chronic Conditions<InfoTip>Sum of (eligible population × prevalence rate) for each condition. Includes overlap.</InfoTip></p>
               <p className="text-2xl font-bold text-gray-900 tracking-tight">{formatNumber(totalWithCondition)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Total With BH Comorbidity</p>
+              <p className="text-sm text-gray-500">Total With BH Comorbidity<InfoTip>Sum of (est. with condition × BH comorbidity rate). Rates: 20–25% by condition (Anderson 2001, Lichtman 2014, Mitchell 2011).</InfoTip></p>
               <p className="text-2xl font-bold text-indigo-700 tracking-tight">{formatNumber(totalWithBhComorbidity)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Total Est. Untreated</p>
+              <p className="text-sm text-gray-500">Total Est. Untreated<InfoTip>Sum of (BH comorbidity × untreated rate). Untreated rate: ~57% (NIMH/NSDUH).</InfoTip></p>
               <p className="text-2xl font-bold text-teal-700 tracking-tight">{formatNumber(totalUntreated)}</p>
             </div>
           </div>
@@ -152,7 +153,7 @@ export function ComorbidityAnalysis() {
               <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                   <div>
-                    <p className="text-gray-500">Condition Prevalence</p>
+                    <p className="text-gray-500">Condition Prevalence<InfoTip>National benchmark. Source varies by condition (CDC, AHA, ACS, NCCN).</InfoTip></p>
                     <p className="font-semibold text-gray-900">
                       {r.prevalenceRate !== null
                         ? formatPercent(r.prevalenceRate)
@@ -160,7 +161,7 @@ export function ComorbidityAnalysis() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-gray-500">Est. With Condition</p>
+                    <p className="text-gray-500">Est. With Condition<InfoTip>Eligible population × prevalence rate.</InfoTip></p>
                     <p className="font-semibold text-gray-900">
                       {r.estimatedWithCondition !== null
                         ? formatNumber(r.estimatedWithCondition)
@@ -168,7 +169,7 @@ export function ComorbidityAnalysis() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-gray-500">BH Comorbidity Rate</p>
+                    <p className="text-gray-500">BH Comorbidity Rate<InfoTip>Depression comorbidity rate for this condition. Sources: Anderson 2001, Lichtman 2014, Mitchell 2011, Demyttenaere 2003.</InfoTip></p>
                     <p className="font-semibold text-gray-900">
                       {r.bhComorbidityRate !== null
                         ? formatPercent(r.bhComorbidityRate)
@@ -176,7 +177,7 @@ export function ComorbidityAnalysis() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-gray-500">Est. With BH Comorbidity</p>
+                    <p className="text-gray-500">Est. With BH Comorbidity<InfoTip>Est. with condition × BH comorbidity rate.</InfoTip></p>
                     <p className="font-semibold text-gray-900">
                       {r.estimatedWithBhComorbidity !== null
                         ? formatNumber(r.estimatedWithBhComorbidity)
@@ -184,7 +185,7 @@ export function ComorbidityAnalysis() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-gray-500">Untreated Rate</p>
+                    <p className="text-gray-500">Untreated Rate<InfoTip>~57% of those with BH conditions do not receive treatment (NIMH/NSDUH).</InfoTip></p>
                     <p className="font-semibold text-gray-900">
                       {r.untreatedRate !== null
                         ? formatPercent(r.untreatedRate)
@@ -192,7 +193,7 @@ export function ComorbidityAnalysis() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-gray-500">Est. Untreated</p>
+                    <p className="text-gray-500">Est. Untreated<InfoTip>Est. with BH comorbidity × 57% untreated rate.</InfoTip></p>
                     <p className="font-semibold text-teal-700">
                       {r.estimatedUntreated !== null
                         ? formatNumber(r.estimatedUntreated)

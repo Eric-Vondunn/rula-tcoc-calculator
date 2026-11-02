@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { NumberInput } from '@/components/shared/number-input';
 import { Disclaimer } from '@/components/shared/disclaimer';
 import { formatNumber, formatCurrency } from '@/lib/utils';
+import { InfoTip } from '@/components/shared/info-tip';
 import { OVERLAP_DISCLAIMER, PRODUCTIVITY_DISCLAIMER } from '@/data/defaults';
 import { absenteeismBenchmarks } from '@/data/defaults';
 import {
@@ -87,7 +88,7 @@ export function Absenteeism() {
               helpText="Standard: 250 days"
             />
             <div className="space-y-1.5">
-              <p className="text-sm font-medium text-gray-700">Daily Cost per Employee</p>
+              <p className="text-sm font-medium text-gray-700">Daily Cost per Employee<InfoTip>Average salary ÷ workdays per year.</InfoTip></p>
               <p className="text-2xl font-bold text-gray-900">{formatCurrency(ar.dailyCost)}</p>
               <p className="text-xs text-gray-400">Salary / workdays</p>
             </div>
@@ -108,22 +109,22 @@ export function Absenteeism() {
             {/* Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="rounded-lg border border-gray-200 p-4 text-center">
-                <p className="text-sm text-gray-500">No MH Condition</p>
+                <p className="text-sm text-gray-500">No MH Condition<InfoTip>4.0 days/year baseline (Bureau of Labor Statistics).</InfoTip></p>
                 <p className="text-3xl font-bold text-gray-400 mt-1">{ar.missedDaysNoMh}</p>
                 <p className="text-xs text-gray-400 mt-1">days / year</p>
               </div>
               <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-center">
-                <p className="text-sm text-red-700">With MH (Untreated)</p>
+                <p className="text-sm text-red-700">With MH (Untreated)<InfoTip>9.0 days/year (Kessler et al. 2006). ~2.25x baseline.</InfoTip></p>
                 <p className="text-3xl font-bold text-red-600 mt-1">{ar.missedDaysUntreatedMh}</p>
                 <p className="text-xs text-red-400 mt-1">days / year ({((ar.missedDaysUntreatedMh / ar.missedDaysNoMh)).toFixed(1)}x baseline)</p>
               </div>
               <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-center">
-                <p className="text-sm text-emerald-700">With MH (Treated)</p>
+                <p className="text-sm text-emerald-700">With MH (Treated)<InfoTip>5.5 days/year (modeled improvement with treatment).</InfoTip></p>
                 <p className="text-3xl font-bold text-emerald-600 mt-1">{ar.missedDaysTreatedMh}</p>
                 <p className="text-xs text-emerald-400 mt-1">days / year</p>
               </div>
               <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-center">
-                <p className="text-sm text-red-800">Chronic + Untreated MH</p>
+                <p className="text-sm text-red-800">Chronic + Untreated MH<InfoTip>12.0 days/year (Loeppke et al. 2009). Chronic condition + untreated BH.</InfoTip></p>
                 <p className="text-3xl font-bold text-red-700 mt-1">{ar.missedDaysChronicUntreated}</p>
                 <p className="text-xs text-red-400 mt-1">days / year ({((ar.missedDaysChronicUntreated / ar.missedDaysNoMh)).toFixed(1)}x baseline)</p>
               </div>
@@ -171,25 +172,25 @@ export function Absenteeism() {
                   return (
                     <>
                       <tr className="border-b border-gray-100">
-                        <td className="py-3 px-3 text-gray-700">Incremental Medical Claims</td>
+                        <td className="py-3 px-3 text-gray-700">Incremental Medical Claims<InfoTip>Untreated: $5,000/yr. Treated: $2,000/yr. Benchmark incremental claims.</InfoTip></td>
                         <td className="py-3 px-3 text-right font-semibold text-red-600">{formatCurrency(r.untreatedMedicalClaims)}</td>
                         <td className="py-3 px-3 text-right font-semibold text-emerald-600">{formatCurrency(r.treatedMedicalClaims)}</td>
                         <td className="py-3 px-3 text-right font-semibold text-teal-600">{formatCurrency(r.untreatedMedicalClaims - r.treatedMedicalClaims)}</td>
                       </tr>
                       <tr className="border-b border-gray-100">
-                        <td className="py-3 px-3 text-gray-700">Absenteeism (Lost Productivity)</td>
+                        <td className="py-3 px-3 text-gray-700">Absenteeism (Lost Productivity)<InfoTip>(12 missed days − 4 baseline) × daily cost untreated; (7 − 4) × daily cost treated. Loeppke 2009, BLS.</InfoTip></td>
                         <td className="py-3 px-3 text-right font-semibold text-red-600">{formatCurrency(r.untreatedAbsenteeismCost)}</td>
                         <td className="py-3 px-3 text-right font-semibold text-emerald-600">{formatCurrency(r.treatedAbsenteeismCost)}</td>
                         <td className="py-3 px-3 text-right font-semibold text-teal-600">{formatCurrency(r.untreatedAbsenteeismCost - r.treatedAbsenteeismCost)}</td>
                       </tr>
                       <tr className="border-b border-gray-100">
-                        <td className="py-3 px-3 text-gray-700">Short-Term Disability</td>
+                        <td className="py-3 px-3 text-gray-700">Short-Term Disability<InfoTip>$800 baseline × 2.0x multiplier untreated; × 1.3x treated.</InfoTip></td>
                         <td className="py-3 px-3 text-right font-semibold text-red-600">{formatCurrency(r.untreatedStdCost)}</td>
                         <td className="py-3 px-3 text-right font-semibold text-emerald-600">{formatCurrency(r.treatedStdCost)}</td>
                         <td className="py-3 px-3 text-right font-semibold text-teal-600">{formatCurrency(r.untreatedStdCost - r.treatedStdCost)}</td>
                       </tr>
                       <tr className="border-b border-gray-100">
-                        <td className="py-3 px-3 text-gray-700">Rula Treatment Cost</td>
+                        <td className="py-3 px-3 text-gray-700">Rula Treatment Cost<InfoTip>$130/session × 10 avg sessions = $1,300/person.</InfoTip></td>
                         <td className="py-3 px-3 text-right text-gray-400">$0</td>
                         <td className="py-3 px-3 text-right font-semibold text-amber-600">{formatCurrency(r.rulaTreatmentCost)}</td>
                         <td className="py-3 px-3 text-right font-semibold text-amber-600">({formatCurrency(r.rulaTreatmentCost)})</td>
@@ -228,42 +229,42 @@ export function Absenteeism() {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Untreated Population</p>
+              <p className="text-sm text-gray-500">Untreated Population<InfoTip>Sum of est. untreated across all conditions. Includes overlap.</InfoTip></p>
               <p className="text-2xl font-bold text-gray-900">{formatNumber(ar.totalUntreatedPopulation)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Total Excess Days Lost</p>
+              <p className="text-sm text-gray-500">Total Excess Days Lost<InfoTip>Untreated population × (12 chronic+untreated days − 4 baseline days) per person.</InfoTip></p>
               <p className="text-2xl font-bold text-red-600">{formatNumber(ar.totalMissedDaysUntreated)}</p>
               <p className="text-xs text-gray-400">above baseline</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Total Productivity Loss</p>
+              <p className="text-sm text-gray-500">Total Productivity Loss<InfoTip>Total excess days lost × daily cost per employee.</InfoTip></p>
               <p className="text-2xl font-bold text-red-700">{formatCurrency(ar.totalProductivityLossUntreated)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Rula Investment</p>
+              <p className="text-sm text-gray-500">Rula Investment<InfoTip>Untreated population × $1,300/person ($130/session × 10 sessions).</InfoTip></p>
               <p className="text-2xl font-bold text-amber-600">{formatCurrency(ar.totalRulaTreatmentCost)}</p>
               <p className="text-xs text-gray-400">{formatCurrency(rulaCostPerPerson)}/person</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Productivity Recovered</p>
+              <p className="text-sm text-gray-500">Productivity Recovered<InfoTip>Untreated population × (12 untreated − 7 treated days) × daily cost.</InfoTip></p>
               <p className="text-2xl font-bold text-emerald-600">{formatCurrency(ar.totalProductivityGain)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Net Productivity Savings</p>
+              <p className="text-sm text-gray-500">Net Productivity Savings<InfoTip>Total productivity recovered minus Rula treatment investment.</InfoTip></p>
               <p className={`text-2xl font-bold ${ar.netProductivitySavings >= 0 ? 'text-teal-700' : 'text-red-600'}`}>
                 {formatCurrency(ar.netProductivitySavings)}
               </p>
               <p className="text-xs text-gray-400">After Rula investment</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Days Recovered</p>
+              <p className="text-sm text-gray-500">Days Recovered<InfoTip>Total excess days (untreated) minus total excess days (after treatment).</InfoTip></p>
               <p className="text-2xl font-bold text-emerald-600">
                 {formatNumber(ar.totalMissedDaysUntreated - ar.totalMissedDaysAfterTreatment)}
               </p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Productivity ROI</p>
+              <p className="text-sm text-gray-500">Productivity ROI<InfoTip>Total productivity recovered ÷ total Rula treatment cost.</InfoTip></p>
               <p className="text-2xl font-bold text-teal-700">
                 {ar.totalRulaTreatmentCost > 0
                   ? `${((ar.totalProductivityGain / ar.totalRulaTreatmentCost)).toFixed(1)}x`
@@ -287,11 +288,11 @@ export function Absenteeism() {
                 <tr className="border-b border-gray-200">
                   <th className="text-left py-3 px-3 font-medium text-gray-500">Condition</th>
                   <th className="text-right py-3 px-3 font-medium text-gray-500">Untreated</th>
-                  <th className="text-right py-3 px-3 font-medium text-gray-500">Excess Days Lost</th>
-                  <th className="text-right py-3 px-3 font-medium text-gray-500">Productivity Loss</th>
-                  <th className="text-right py-3 px-3 font-medium text-gray-500">Rula Cost</th>
-                  <th className="text-right py-3 px-3 font-medium text-gray-500">Productivity Gain</th>
-                  <th className="text-right py-3 px-3 font-medium text-gray-500">Net Savings</th>
+                  <th className="text-right py-3 px-3 font-medium text-gray-500">Excess Days Lost<InfoTip>Untreated count × (12 − 4) excess days per person.</InfoTip></th>
+                  <th className="text-right py-3 px-3 font-medium text-gray-500">Productivity Loss<InfoTip>Excess days × daily cost.</InfoTip></th>
+                  <th className="text-right py-3 px-3 font-medium text-gray-500">Rula Cost<InfoTip>Untreated count × $1,300/person.</InfoTip></th>
+                  <th className="text-right py-3 px-3 font-medium text-gray-500">Productivity Gain<InfoTip>Untreated count × (12 − 7 recovered days) × daily cost.</InfoTip></th>
+                  <th className="text-right py-3 px-3 font-medium text-gray-500">Net Savings<InfoTip>Productivity gain minus Rula treatment cost.</InfoTip></th>
                 </tr>
               </thead>
               <tbody>

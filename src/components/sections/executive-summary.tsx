@@ -12,6 +12,7 @@ import { conditionBenchmarks } from '@/data/benchmarks';
 import { computeModel, computePlan, rateOf, ppl, usd, pct, longDate, parseYmd, schedule } from '@/components/sections/mutual-action-plan/calculations';
 import { TAC, MOM, MONTHS, ADDONS, CH } from '@/components/sections/mutual-action-plan/constants';
 import { FollowUpEmail } from '@/components/sections/follow-up-email';
+import { InfoTip } from '@/components/shared/info-tip';
 
 export function ExecutiveSummary() {
   const { state, derived } = useCalculator();
@@ -160,37 +161,37 @@ export function ExecutiveSummary() {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Total Covered Members</p>
+              <p className="text-sm text-gray-500">Total Covered Members<InfoTip>User input: total employees and covered dependents.</InfoTip></p>
               <p className="text-2xl font-bold text-gray-900">{formatNumber(clientInputs.totalCoveredMembers)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Combined Chronic Conditions</p>
+              <p className="text-sm text-gray-500">Combined Chronic Conditions<InfoTip>Sum of (eligible population × prevalence rate) per condition. Includes overlap.</InfoTip></p>
               <p className="text-2xl font-bold text-gray-900">{formatNumber(totalWithCondition)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Combined BH Comorbidity</p>
+              <p className="text-sm text-gray-500">Combined BH Comorbidity<InfoTip>Sum of (est. with condition × BH comorbidity rate). Rates: 20–25% (Anderson 2001, Lichtman 2014, Mitchell 2011).</InfoTip></p>
               <p className="text-2xl font-bold text-indigo-700">{formatNumber(totalWithBhComorbidity)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Combined Untreated BH</p>
+              <p className="text-sm text-gray-500">Combined Untreated BH<InfoTip>Sum of (BH comorbidity × 57% untreated rate). Source: NIMH/NSDUH.</InfoTip></p>
               <p className="text-2xl font-bold text-teal-700">{formatNumber(totalUntreated)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Combined Modeled Spending</p>
+              <p className="text-sm text-gray-500">Combined Modeled Spending<InfoTip>Sum of (untreated count × $10,000 incremental cost/person). Source: IBI.</InfoTip></p>
               <p className="text-2xl font-bold text-gray-900">{formatCurrency(totalModeledSpending)}</p>
             </div>
             {baseScenarioComplete.length > 0 && (
               <>
                 <div className="space-y-1">
-                  <p className="text-sm text-gray-500">Combined Gross Savings (Base)</p>
+                  <p className="text-sm text-gray-500">Combined Gross Savings (Base)<InfoTip>Sum of (modeled spending × recoverable cost %) per condition.</InfoTip></p>
                   <p className="text-2xl font-bold text-gray-900">{formatCurrency(totalGrossSavings)}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm text-gray-500">Combined Treatment Cost (Base)</p>
+                  <p className="text-sm text-gray-500">Combined Treatment Cost (Base)<InfoTip>Sum of (treatment initiation cost + additional scenario costs) per condition.</InfoTip></p>
                   <p className="text-2xl font-bold text-red-600">{formatCurrency(totalTreatmentCost)}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm text-gray-500">Combined Net Savings (Base)</p>
+                  <p className="text-sm text-gray-500">Combined Net Savings (Base)<InfoTip>Gross savings minus total treatment cost.</InfoTip></p>
                   <p className={`text-2xl font-bold ${totalNetSavings >= 0 ? 'text-emerald-700' : 'text-red-600'}`}>
                     {formatCurrency(totalNetSavings)}
                   </p>
@@ -202,43 +203,43 @@ export function ExecutiveSummary() {
           <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Total Cost Savings — Treated vs Untreated (All Components)</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Medical Claims Savings</p>
+              <p className="text-sm text-gray-500">Medical Claims Savings<InfoTip>Population × ($5,000 untreated − $2,000 treated) per person.</InfoTip></p>
               <p className="text-2xl font-bold text-green-700">
                 {formatCurrency(totalMedicalSavings)}
               </p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Absenteeism / Productivity Savings</p>
+              <p className="text-sm text-gray-500">Absenteeism / Productivity Savings<InfoTip>Population × [(12 − 4 untreated days) − (7 − 4 treated days)] × daily cost.</InfoTip></p>
               <p className="text-2xl font-bold text-green-700">
                 {formatCurrency(totalAbsenteeismSavings)}
               </p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Short-Term Disability Savings</p>
+              <p className="text-sm text-gray-500">Short-Term Disability Savings<InfoTip>Population × $800 × (2.0x untreated − 1.3x treated) multiplier difference.</InfoTip></p>
               <p className="text-2xl font-bold text-green-700">
                 {formatCurrency(totalStdSavings)}
               </p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Gross Savings (All Components)</p>
+              <p className="text-sm text-gray-500">Gross Savings (All Components)<InfoTip>Medical + absenteeism + STD savings combined.</InfoTip></p>
               <p className="text-2xl font-bold text-green-700">
                 {formatCurrency(totalGrossSavingsAllComponents)}
               </p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Rula Treatment Investment</p>
+              <p className="text-sm text-gray-500">Rula Treatment Investment<InfoTip>Untreated population × $1,300/person ($130/session × 10 sessions).</InfoTip></p>
               <p className="text-2xl font-bold text-gray-900">
                 {formatCurrency(totalRulaCost)}
               </p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Net Savings (After Rula Cost)</p>
+              <p className="text-sm text-gray-500">Net Savings (After Rula Cost)<InfoTip>Gross savings (medical + absenteeism + STD) minus Rula treatment investment.</InfoTip></p>
               <p className={`text-2xl font-bold ${totalNetSavingsAllComponents >= 0 ? 'text-emerald-700' : 'text-red-600'}`}>
                 {formatCurrency(totalNetSavingsAllComponents)}
               </p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Per-Person Savings</p>
+              <p className="text-sm text-gray-500">Per-Person Savings<InfoTip>Untreated total cost − treated total cost per person per year.</InfoTip></p>
               <p className="text-2xl font-bold text-green-700">
                 {treatedVsUntreatedResults.length > 0
                   ? formatCurrency(treatedVsUntreatedResults[0].annualSavingsPerPerson)
@@ -246,7 +247,7 @@ export function ExecutiveSummary() {
               </p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Untreated Population</p>
+              <p className="text-sm text-gray-500">Untreated Population<InfoTip>Sum of est. untreated across all conditions. Includes overlap.</InfoTip></p>
               <p className="text-2xl font-bold text-gray-900">
                 {formatNumber(absenteeismResult.totalUntreatedPopulation)}
               </p>
@@ -570,15 +571,15 @@ export function ExecutiveSummary() {
             <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Projected Impact</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1">
-                <p className="text-sm text-gray-500">Benefits-eligible employees</p>
+                <p className="text-sm text-gray-500">Benefits-eligible employees<InfoTip>Headcount entered in the Rula Engagement Plan tab.</InfoTip></p>
                 <p className="text-2xl font-bold text-gray-900">{mapState.headcount.toLocaleString('en-US')}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-gray-500">Projected care starts</p>
+                <p className="text-sm text-gray-500">Projected care starts<InfoTip>Headcount × engagement rate. Rate interpolated geometrically between 0.15% (employer-only) and 0.81% (full plan) based on channel selections.</InfoTip></p>
                 <p className="text-2xl font-bold text-teal-700">{ppl(projectedCareStarts)}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-gray-500">Annual cost exposure addressed</p>
+                <p className="text-sm text-gray-500">Annual cost exposure addressed<InfoTip>Projected care starts × $9,450 per affected employee.</InfoTip></p>
                 <p className="text-2xl font-bold text-teal-700">{usd(projectedCostAddressed)}</p>
               </div>
             </div>

@@ -2,12 +2,14 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { InfoTip } from '@/components/shared/info-tip';
 import type { LucideIcon } from 'lucide-react';
 
 interface MetricCardProps {
   label: string;
   value: string | null;
   subtitle?: string;
+  tooltip?: string;
   icon?: LucideIcon;
   iconColor?: string;
   unavailableText?: string;
@@ -18,6 +20,7 @@ export function MetricCard({
   label,
   value,
   subtitle,
+  tooltip,
   icon: Icon,
   iconColor = 'text-teal-600',
   unavailableText = 'Data unavailable',
@@ -28,7 +31,7 @@ export function MetricCard({
       <CardContent className="p-5">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
-            <p className="text-sm font-medium text-gray-500">{label}</p>
+            <p className="text-sm font-medium text-gray-500">{label}{tooltip && <InfoTip>{tooltip}</InfoTip>}</p>
             {value !== null ? (
               <p className="text-2xl font-bold text-gray-900 tracking-tight">{value}</p>
             ) : (
