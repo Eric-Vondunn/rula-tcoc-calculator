@@ -57,6 +57,18 @@ export function PopulationOverview() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Client / Employer Name
+            </label>
+            <input
+              type="text"
+              value={clientInputs.clientName}
+              onChange={(e) => updateClientInputs({ clientName: e.target.value })}
+              placeholder="Enter employer name"
+              className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+            />
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <NumberInput
               label="Total Covered Members"

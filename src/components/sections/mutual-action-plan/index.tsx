@@ -73,6 +73,7 @@ export function MutualActionPlan() {
   const { state: calcState } = useCalculator();
   const [state, dispatch] = useReducer(mapReducer, {
     ...initialState,
+    employerName: calcState.clientInputs.clientName || '[Employer Name]',
     headcount: Math.round(calcState.clientInputs.totalCoveredMembers * calcState.clientInputs.adultPercentage),
   });
 
