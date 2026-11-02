@@ -94,7 +94,7 @@ export function MutualActionPlan() {
       {/* Header */}
       <Card className="border-gray-200">
         <CardContent className="p-6">
-          <div className="text-xs font-bold tracking-wider uppercase text-teal-700 mb-2">Mutual Action Plan</div>
+          <div className="text-xs font-bold tracking-wider uppercase text-teal-700 mb-2">Rula Engagement Plan</div>
           <input
             type="text"
             value={state.employerName}
@@ -127,7 +127,7 @@ export function MutualActionPlan() {
               }`}
             >
               <span className="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold bg-gray-200 text-gray-700" style={state.activeView === 'v2' ? { background: 'rgba(255,255,255,0.26)', color: '#fff' } : {}}>2</span>
-              Our Mutual Action Plan
+              Our Rula Engagement Plan
             </button>
           </div>
         </CardContent>
