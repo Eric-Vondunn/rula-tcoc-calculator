@@ -14,7 +14,7 @@ export function Header() {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-xl font-bold text-teal-700 tracking-tight">RULA</span>
+              <span className="text-xl font-bold text-rula-purple tracking-tight">RULA</span>
               <span className="hidden sm:inline text-sm text-gray-400">|</span>
               <span className="hidden sm:inline text-sm font-medium text-gray-600">
                 Behavioral Health Total Cost of Care Calculator

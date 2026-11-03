@@ -261,7 +261,7 @@ export function FollowUpEmail(props: FollowUpEmailProps) {
             onClick={() => setVersion('consultant')}
             className={`flex-1 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
               version === 'consultant'
-                ? 'bg-teal-700 text-white shadow-sm'
+                ? 'bg-rula-sp3 text-rula-sand shadow-sm'
                 : 'text-gray-500 hover:text-gray-700 hover:bg-white'
             }`}
           >
@@ -272,7 +272,7 @@ export function FollowUpEmail(props: FollowUpEmailProps) {
             onClick={() => setVersion('employer')}
             className={`flex-1 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
               version === 'employer'
-                ? 'bg-teal-700 text-white shadow-sm'
+                ? 'bg-rula-sp3 text-rula-sand shadow-sm'
                 : 'text-gray-500 hover:text-gray-700 hover:bg-white'
             }`}
           >
@@ -287,7 +287,7 @@ export function FollowUpEmail(props: FollowUpEmailProps) {
           <button
             type="button"
             onClick={() => handleCopy(email.subject, 'subject')}
-            className="shrink-0 text-xs font-medium text-teal-700 hover:text-teal-800 transition-colors"
+            className="shrink-0 text-xs font-medium text-rula-sp3 hover:text-rula-purple transition-colors"
           >
             {copiedSubject ? 'Copied!' : 'Copy'}
           </button>
@@ -303,7 +303,7 @@ export function FollowUpEmail(props: FollowUpEmailProps) {
           <button
             type="button"
             onClick={() => handleCopy(email.body, 'body')}
-            className="inline-flex items-center rounded-full bg-teal-700 text-white px-5 py-2.5 text-sm font-medium hover:bg-teal-800 transition-colors"
+            className="inline-flex items-center rounded-full bg-rula-sp3 text-rula-sand px-5 py-2.5 text-sm font-medium hover:bg-rula-purple transition-colors"
           >
             {copiedBody ? 'Copied!' : 'Copy Email'}
           </button>

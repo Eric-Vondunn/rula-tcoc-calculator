@@ -102,7 +102,7 @@ export function NumberInput({
       </div>
       {helpText && <p className="text-xs text-gray-400">{helpText}</p>}
       {sourceLabel && (
-        <p className="text-xs text-teal-600">Source: {sourceLabel}</p>
+        <p className="text-xs text-rula-sp3">Source: {sourceLabel}</p>
       )}
     </div>
   );

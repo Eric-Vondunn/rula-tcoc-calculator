@@ -31,7 +31,7 @@ export function AwarenessView({ model: m, plan: P, state, dispatch }: Props) {
           <p><strong className="text-gray-900">81% of Americans say mental health matters. Too often, we still wait.</strong> Making care available is the first step. Getting people to take it is the work.</p>
         </div>
 
-        <h3 className="text-base font-semibold text-teal-700 mt-6 mb-2">What this could mean for your workforce</h3>
+        <h3 className="text-base font-semibold text-rula-purple mt-6 mb-2">What this could mean for your workforce</h3>
         <p className="text-sm text-gray-500 mb-3">
           National findings from Rula&rsquo;s 2026 State of Mental Health Report, applied to your {n0(m.h)} employees.
         </p>
@@ -46,7 +46,7 @@ export function AwarenessView({ model: m, plan: P, state, dispatch }: Props) {
             <Card key={card.rate} className="border-gray-200">
               <CardContent className="flex items-center gap-4 p-4">
                 <div>
-                  <div className="text-2xl font-semibold text-teal-700">{card.num}</div>
+                  <div className="text-2xl font-semibold text-rula-purple">{card.num}</div>
                   <div className="text-sm text-gray-700 mt-1">{card.label}<InfoTip>{card.tip}</InfoTip></div>
                   <div className="text-xs text-gray-400 mt-1">{card.rate} of workforce</div>
                 </div>
@@ -69,9 +69,9 @@ export function AwarenessView({ model: m, plan: P, state, dispatch }: Props) {
           <p><strong className="text-gray-900">What employees carry privately shows up in missed work and intent to leave.</strong></p>
         </div>
 
-        <Card className="border-l-4 border-l-teal-600 mb-4">
+        <Card className="border-l-4 border-l-rula-sp3 mb-4">
           <CardContent className="p-5">
-            <div className="text-4xl font-semibold text-teal-700">{ppl(m.affected)}<InfoTip>43% non-disclosure × 60% with work impact × headcount.</InfoTip></div>
+            <div className="text-4xl font-semibold text-rula-purple">{ppl(m.affected)}<InfoTip>43% non-disclosure × 60% with work impact × headcount.</InfoTip></div>
             <div className="text-base text-gray-700 mt-2">
               employees who keep their struggles private <strong className="text-gray-900">and</strong> whose work is affected. That&rsquo;s <strong className="text-gray-900">{ppl(m.miss6)}</strong> missing 6+ workdays a year, and <strong className="text-gray-900">{ppl(m.quitters)}</strong> who have considered quitting.
             </div>
@@ -81,8 +81,8 @@ export function AwarenessView({ model: m, plan: P, state, dispatch }: Props) {
         {/* Bar chart */}
         <div className="space-y-4">
           <div className="flex gap-5 text-xs text-gray-500 ml-48">
-            <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded-sm bg-teal-700" /> Keep struggles private</span>
-            <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded-sm bg-teal-300" /> Open about mental health</span>
+            <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded-sm bg-rula-sp3" /> Keep struggles private</span>
+            <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded-sm bg-rula-light" /> Open about mental health</span>
           </div>
           {BAR_DATA.map((bar) => {
             const maxVal = Math.max(bar.hideVal, bar.openVal);
@@ -91,11 +91,11 @@ export function AwarenessView({ model: m, plan: P, state, dispatch }: Props) {
                 <span className="text-gray-700">{bar.label}</span>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <div className="h-5 rounded bg-teal-700" style={{ width: `${(bar.hideVal / maxVal) * 100}%`, minWidth: 3 }} />
+                    <div className="h-5 rounded bg-rula-sp3" style={{ width: `${(bar.hideVal / maxVal) * 100}%`, minWidth: 3 }} />
                     <span className="text-xs text-gray-500">{pct(bar.hideVal)}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="h-5 rounded bg-teal-300" style={{ width: `${(bar.openVal / maxVal) * 100}%`, minWidth: 3 }} />
+                    <div className="h-5 rounded bg-rula-light" style={{ width: `${(bar.openVal / maxVal) * 100}%`, minWidth: 3 }} />
                     <span className="text-xs text-gray-500">{pct(bar.openVal)}</span>
                   </div>
                 </div>
@@ -141,9 +141,9 @@ export function AwarenessView({ model: m, plan: P, state, dispatch }: Props) {
 
       {/* Readout panel */}
       <section>
-        <div className="rounded-2xl bg-slate-800 text-white p-6 grid grid-cols-1 md:grid-cols-[1.15fr_1fr] gap-6">
+        <div className="rounded-2xl bg-rula-spruce text-white p-6 grid grid-cols-1 md:grid-cols-[1.15fr_1fr] gap-6">
           <div>
-            <div className="text-xs font-medium tracking-wider uppercase text-teal-300 mb-2">
+            <div className="text-xs font-medium tracking-wider uppercase text-rula-yellow mb-2">
               Over one plan year, all four quarters running
             </div>
             <div className="text-5xl font-semibold">{ppl(newPeople)}<InfoTip>Headcount × engagement rate for selected channel mix.</InfoTip></div>
@@ -153,7 +153,7 @@ export function AwarenessView({ model: m, plan: P, state, dispatch }: Props) {
           </div>
           <div className="space-y-3">
             <div className="flex items-baseline gap-3 border-b border-white/10 pb-3">
-              <span className="text-2xl font-semibold text-teal-300 min-w-[104px] text-right tabular-nums">
+              <span className="text-2xl font-semibold text-rula-yellow min-w-[104px] text-right tabular-nums">
                 {careMultVal.toFixed(1)}×
               </span>
               <span className="text-xs text-gray-300">
@@ -161,13 +161,13 @@ export function AwarenessView({ model: m, plan: P, state, dispatch }: Props) {
               </span>
             </div>
             <div className="flex items-baseline gap-3 border-b border-white/10 pb-3">
-              <span className="text-2xl font-semibold text-teal-300 min-w-[104px] text-right tabular-nums">
+              <span className="text-2xl font-semibold text-rula-yellow min-w-[104px] text-right tabular-nums">
                 {usd(newDollars)}
               </span>
               <span className="text-xs text-gray-300">of annual cost exposure now being addressed</span>
             </div>
             <div className="flex items-baseline gap-3">
-              <span className="text-2xl font-semibold text-teal-300 min-w-[104px] text-right tabular-nums">
+              <span className="text-2xl font-semibold text-rula-yellow min-w-[104px] text-right tabular-nums">
                 {ppl(newPeople)}
               </span>
               <span className="text-xs text-gray-300">
@@ -181,7 +181,7 @@ export function AwarenessView({ model: m, plan: P, state, dispatch }: Props) {
           <div className="md:col-span-2 mt-1">
             <div className="h-2 rounded-full bg-white/20 overflow-hidden">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-teal-500 to-teal-300 transition-all duration-300"
+                className="h-full rounded-full bg-gradient-to-r from-rula-mid to-rula-light transition-all duration-300"
                 style={{ width: `${Math.max(progress * 100, 2)}%` }}
               />
             </div>
@@ -202,7 +202,7 @@ export function AwarenessView({ model: m, plan: P, state, dispatch }: Props) {
           <button
             type="button"
             onClick={() => dispatch({ type: 'SET_ACTIVE_VIEW', value: 'v2' })}
-            className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-4 py-2.5 text-sm font-medium text-teal-700 hover:bg-teal-100 transition-colors"
+            className="inline-flex items-center gap-2 rounded-full border border-rula-sp2 bg-rula-sp1 px-4 py-2.5 text-sm font-medium text-rula-purple hover:bg-rula-sp2 transition-colors"
           >
             Build the plan behind these numbers &rarr;
           </button>

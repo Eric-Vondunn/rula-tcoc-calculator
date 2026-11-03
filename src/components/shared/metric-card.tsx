@@ -22,7 +22,7 @@ export function MetricCard({
   subtitle,
   tooltip,
   icon: Icon,
-  iconColor = 'text-teal-600',
+  iconColor = 'text-rula-sp3',
   unavailableText = 'Data unavailable',
   className,
 }: MetricCardProps) {

@@ -23,8 +23,8 @@ import {
 const COLORS = {
   untreated: '#dc2626',
   treated: '#059669',
-  noMh: '#94a3b8',
-  rula: '#0d9488',
+  noMh: '#3F4146',
+  rula: '#46219E',
 };
 
 export function Absenteeism() {
@@ -163,7 +163,7 @@ export function Absenteeism() {
                   <th className="text-left py-3 px-3 font-medium text-gray-500">Cost Component</th>
                   <th className="text-right py-3 px-3 font-medium text-red-600">Untreated</th>
                   <th className="text-right py-3 px-3 font-medium text-emerald-600">Treated (with Rula)</th>
-                  <th className="text-right py-3 px-3 font-medium text-teal-600">Savings</th>
+                  <th className="text-right py-3 px-3 font-medium text-rula-sp3">Savings</th>
                 </tr>
               </thead>
               <tbody>
@@ -175,19 +175,19 @@ export function Absenteeism() {
                         <td className="py-3 px-3 text-gray-700">Incremental Medical Claims<InfoTip>Untreated: $5,000/yr. Treated: $2,000/yr. Benchmark incremental claims.</InfoTip></td>
                         <td className="py-3 px-3 text-right font-semibold text-red-600">{formatCurrency(r.untreatedMedicalClaims)}</td>
                         <td className="py-3 px-3 text-right font-semibold text-emerald-600">{formatCurrency(r.treatedMedicalClaims)}</td>
-                        <td className="py-3 px-3 text-right font-semibold text-teal-600">{formatCurrency(r.untreatedMedicalClaims - r.treatedMedicalClaims)}</td>
+                        <td className="py-3 px-3 text-right font-semibold text-rula-sp3">{formatCurrency(r.untreatedMedicalClaims - r.treatedMedicalClaims)}</td>
                       </tr>
                       <tr className="border-b border-gray-100">
                         <td className="py-3 px-3 text-gray-700">Absenteeism (Lost Productivity)<InfoTip>(12 missed days − 4 baseline) × daily cost untreated; (7 − 4) × daily cost treated. Loeppke 2009, BLS.</InfoTip></td>
                         <td className="py-3 px-3 text-right font-semibold text-red-600">{formatCurrency(r.untreatedAbsenteeismCost)}</td>
                         <td className="py-3 px-3 text-right font-semibold text-emerald-600">{formatCurrency(r.treatedAbsenteeismCost)}</td>
-                        <td className="py-3 px-3 text-right font-semibold text-teal-600">{formatCurrency(r.untreatedAbsenteeismCost - r.treatedAbsenteeismCost)}</td>
+                        <td className="py-3 px-3 text-right font-semibold text-rula-sp3">{formatCurrency(r.untreatedAbsenteeismCost - r.treatedAbsenteeismCost)}</td>
                       </tr>
                       <tr className="border-b border-gray-100">
                         <td className="py-3 px-3 text-gray-700">Short-Term Disability<InfoTip>$800 baseline × 2.0x multiplier untreated; × 1.3x treated.</InfoTip></td>
                         <td className="py-3 px-3 text-right font-semibold text-red-600">{formatCurrency(r.untreatedStdCost)}</td>
                         <td className="py-3 px-3 text-right font-semibold text-emerald-600">{formatCurrency(r.treatedStdCost)}</td>
-                        <td className="py-3 px-3 text-right font-semibold text-teal-600">{formatCurrency(r.untreatedStdCost - r.treatedStdCost)}</td>
+                        <td className="py-3 px-3 text-right font-semibold text-rula-sp3">{formatCurrency(r.untreatedStdCost - r.treatedStdCost)}</td>
                       </tr>
                       <tr className="border-b border-gray-100">
                         <td className="py-3 px-3 text-gray-700">Rula Treatment Cost<InfoTip>$130/session × 10 avg sessions = $1,300/person.</InfoTip></td>
@@ -199,7 +199,7 @@ export function Absenteeism() {
                         <td className="py-3 px-3 font-bold text-gray-900">Total Annual Cost Per Person</td>
                         <td className="py-3 px-3 text-right font-bold text-red-700">{formatCurrency(r.untreatedTotalCost)}</td>
                         <td className="py-3 px-3 text-right font-bold text-emerald-700">{formatCurrency(r.treatedTotalCost)}</td>
-                        <td className="py-3 px-3 text-right font-bold text-teal-700">{formatCurrency(r.annualSavingsPerPerson)}</td>
+                        <td className="py-3 px-3 text-right font-bold text-rula-purple">{formatCurrency(r.annualSavingsPerPerson)}</td>
                       </tr>
                     </>
                   );
@@ -208,9 +208,9 @@ export function Absenteeism() {
             </table>
           </div>
           <div className="mt-4 flex items-center gap-4 text-sm">
-            <div className="rounded-lg bg-teal-50 border border-teal-200 px-4 py-2">
-              <span className="text-teal-700 font-medium">Rula Cost: </span>
-              <span className="font-bold text-teal-800">
+            <div className="rounded-lg bg-rula-sp1 border border-rula-sp2 px-4 py-2">
+              <span className="text-rula-purple font-medium">Rula Cost: </span>
+              <span className="font-bold text-rula-purple">
                 {formatCurrency(absenteeismBenchmarks.rulaCostPerSession)} x {absenteeismBenchmarks.rulaAvgSessions} sessions = {formatCurrency(rulaCostPerPerson)}/person
               </span>
             </div>
@@ -219,7 +219,7 @@ export function Absenteeism() {
       </Card>
 
       {/* Population-Level Productivity Impact */}
-      <Card className="border-teal-200 bg-gradient-to-br from-teal-50/50 to-white">
+      <Card className="border-rula-sp2 bg-gradient-to-br from-rula-sp1/50 to-white">
         <CardHeader className="pb-2">
           <CardTitle>Population-Level Productivity Impact</CardTitle>
           <CardDescription className="text-xs text-amber-700">
@@ -252,7 +252,7 @@ export function Absenteeism() {
             </div>
             <div className="space-y-1">
               <p className="text-sm text-gray-500">Net Productivity Savings<InfoTip>Total productivity recovered minus Rula treatment investment.</InfoTip></p>
-              <p className={`text-2xl font-bold ${ar.netProductivitySavings >= 0 ? 'text-teal-700' : 'text-red-600'}`}>
+              <p className={`text-2xl font-bold ${ar.netProductivitySavings >= 0 ? 'text-rula-purple' : 'text-red-600'}`}>
                 {formatCurrency(ar.netProductivitySavings)}
               </p>
               <p className="text-xs text-gray-400">After Rula investment</p>
@@ -265,7 +265,7 @@ export function Absenteeism() {
             </div>
             <div className="space-y-1">
               <p className="text-sm text-gray-500">Productivity ROI<InfoTip>Total productivity recovered ÷ total Rula treatment cost.</InfoTip></p>
-              <p className="text-2xl font-bold text-teal-700">
+              <p className="text-2xl font-bold text-rula-purple">
                 {ar.totalRulaTreatmentCost > 0
                   ? `${((ar.totalProductivityGain / ar.totalRulaTreatmentCost)).toFixed(1)}x`
                   : 'N/A'}
@@ -316,7 +316,7 @@ export function Absenteeism() {
                     </td>
                     <td className="py-3 px-3 text-right font-semibold">
                       {c.netSavings !== null ? (
-                        <span className={c.netSavings >= 0 ? 'text-teal-700' : 'text-red-600'}>
+                        <span className={c.netSavings >= 0 ? 'text-rula-purple' : 'text-red-600'}>
                           {formatCurrency(c.netSavings)}
                         </span>
                       ) : 'N/A'}
@@ -335,7 +335,7 @@ export function Absenteeism() {
                   <td className="py-3 px-3 text-right font-bold text-amber-600">{formatCurrency(ar.totalRulaTreatmentCost)}</td>
                   <td className="py-3 px-3 text-right font-bold text-emerald-600">{formatCurrency(ar.totalProductivityGain)}</td>
                   <td className="py-3 px-3 text-right font-bold">
-                    <span className={ar.netProductivitySavings >= 0 ? 'text-teal-700' : 'text-red-600'}>
+                    <span className={ar.netProductivitySavings >= 0 ? 'text-rula-purple' : 'text-red-600'}>
                       {formatCurrency(ar.netProductivitySavings)}
                     </span>
                   </td>

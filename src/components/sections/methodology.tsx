@@ -64,7 +64,7 @@ function SourceCard({ source }: { source: BenchmarkSource }) {
             href={source.sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-teal-600 hover:underline break-all"
+            className="text-rula-sp3 hover:underline break-all"
           >
             {source.sourceUrl}
           </a>

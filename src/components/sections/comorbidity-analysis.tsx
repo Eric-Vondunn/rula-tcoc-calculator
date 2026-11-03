@@ -49,7 +49,7 @@ export function ComorbidityAnalysis() {
   return (
     <div className="space-y-6">
       {/* Aggregate Summary */}
-      <Card className="border-teal-200 bg-gradient-to-br from-teal-50/50 to-white">
+      <Card className="border-rula-sp2 bg-gradient-to-br from-rula-sp1/50 to-white">
         <CardHeader className="pb-2">
           <CardTitle className="text-base">Comorbidity Totals Across All Conditions</CardTitle>
           <CardDescription className="text-xs text-amber-700">
@@ -64,11 +64,11 @@ export function ComorbidityAnalysis() {
             </div>
             <div className="space-y-1">
               <p className="text-sm text-gray-500">Total With BH Comorbidity<InfoTip>Sum of (est. with condition × BH comorbidity rate). Rates: 20–25% by condition (Anderson 2001, Lichtman 2014, Mitchell 2011).</InfoTip></p>
-              <p className="text-2xl font-bold text-indigo-700 tracking-tight">{formatNumber(totalWithBhComorbidity)}</p>
+              <p className="text-2xl font-bold text-rula-mid tracking-tight">{formatNumber(totalWithBhComorbidity)}</p>
             </div>
             <div className="space-y-1">
               <p className="text-sm text-gray-500">Total Est. Untreated<InfoTip>Sum of (BH comorbidity × untreated rate). Untreated rate: ~57% (NIMH/NSDUH).</InfoTip></p>
-              <p className="text-2xl font-bold text-teal-700 tracking-tight">{formatNumber(totalUntreated)}</p>
+              <p className="text-2xl font-bold text-rula-purple tracking-tight">{formatNumber(totalUntreated)}</p>
             </div>
           </div>
         </CardContent>
@@ -123,8 +123,8 @@ export function ComorbidityAnalysis() {
                         : 'Untreated BH'
                   }
                 />
-                <Bar dataKey="withCondition" fill="#0d9488" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="withBhComorbidity" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="withCondition" fill="#46219E" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="withBhComorbidity" fill="#6C4CEA" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
@@ -194,7 +194,7 @@ export function ComorbidityAnalysis() {
                   </div>
                   <div>
                     <p className="text-gray-500">Est. Untreated<InfoTip>Est. with BH comorbidity × 57% untreated rate.</InfoTip></p>
-                    <p className="font-semibold text-teal-700">
+                    <p className="font-semibold text-rula-purple">
                       {r.estimatedUntreated !== null
                         ? formatNumber(r.estimatedUntreated)
                         : 'N/A'}

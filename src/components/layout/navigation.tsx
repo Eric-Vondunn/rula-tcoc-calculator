@@ -39,7 +39,7 @@ export function Navigation() {
                 className={cn(
                   'flex items-center gap-2 whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium transition-colors',
                   isActive
-                    ? 'border-teal-600 text-teal-700'
+                    ? 'border-rula-sp3 text-rula-purple'
                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                 )}
               >

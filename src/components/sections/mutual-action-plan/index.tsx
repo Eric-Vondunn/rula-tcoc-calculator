@@ -45,12 +45,12 @@ export function MutualActionPlan() {
       {/* Header */}
       <Card className="border-gray-200">
         <CardContent className="p-6">
-          <div className="text-xs font-bold tracking-wider uppercase text-teal-700 mb-2">Rula Engagement Plan</div>
+          <div className="text-xs font-bold tracking-wider uppercase text-rula-purple mb-2">Rula Engagement Plan</div>
           <input
             type="text"
             value={state.employerName}
             onChange={(e) => dispatch({ type: 'SET_EMPLOYER_NAME', value: e.target.value })}
-            className="block w-full border-0 border-b-2 border-dashed border-gray-200 bg-transparent text-2xl font-semibold text-gray-900 py-1 focus:outline-none focus:border-teal-500"
+            className="block w-full border-0 border-b-2 border-dashed border-gray-200 bg-transparent text-2xl font-semibold text-gray-900 py-1 focus:outline-none focus:border-rula-mid"
             aria-label="Employer name"
           />
 
@@ -61,7 +61,7 @@ export function MutualActionPlan() {
               onClick={() => dispatch({ type: 'SET_ACTIVE_VIEW', value: 'v1' })}
               className={`flex-1 flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-colors ${
                 state.activeView === 'v1'
-                  ? 'bg-teal-700 text-white shadow-sm'
+                  ? 'bg-rula-sp3 text-rula-sand shadow-sm'
                   : 'text-gray-500 hover:text-gray-700 hover:bg-white'
               }`}
             >
@@ -73,7 +73,7 @@ export function MutualActionPlan() {
               onClick={() => dispatch({ type: 'SET_ACTIVE_VIEW', value: 'v2' })}
               className={`flex-1 flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-colors ${
                 state.activeView === 'v2'
-                  ? 'bg-teal-700 text-white shadow-sm'
+                  ? 'bg-rula-sp3 text-rula-sand shadow-sm'
                   : 'text-gray-500 hover:text-gray-700 hover:bg-white'
               }`}
             >
@@ -89,13 +89,13 @@ export function MutualActionPlan() {
         <CardContent className="flex items-center gap-6 flex-wrap p-4">
           <div>
             <label htmlFor="map-heads" className="block text-sm text-gray-500 mb-1.5">Benefits-eligible employees</label>
-            <div className="border border-gray-200 rounded-lg bg-gray-50 px-3 focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-500/20 focus-within:bg-white">
+            <div className="border border-gray-200 rounded-lg bg-gray-50 px-3 focus-within:border-rula-mid focus-within:ring-2 focus-within:ring-rula-mid/20 focus-within:bg-white">
               <input
                 id="map-heads"
                 value={state.headcount.toLocaleString('en-US')}
                 onChange={(e) => handleHeadcountChange(e.target.value)}
                 inputMode="numeric"
-                className="border-0 bg-transparent text-xl font-semibold text-teal-700 py-2.5 w-40 text-right focus:outline-none"
+                className="border-0 bg-transparent text-xl font-semibold text-rula-purple py-2.5 w-40 text-right focus:outline-none"
               />
             </div>
           </div>
@@ -118,21 +118,21 @@ export function MutualActionPlan() {
           href="https://www.rula.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center rounded-full bg-teal-600 text-white font-bold px-5 py-2.5 text-sm hover:bg-teal-700 transition-colors"
+          className="inline-flex items-center rounded-full bg-rula-sp3 text-rula-sand font-bold px-5 py-2.5 text-sm hover:bg-rula-purple transition-colors"
         >
           www.rula.com
         </a>
         <button
           type="button"
           onClick={() => window.print()}
-          className="inline-flex items-center rounded-full bg-teal-700 text-white px-5 py-2.5 text-sm font-medium hover:bg-teal-800 transition-colors"
+          className="inline-flex items-center rounded-full bg-rula-sp3 text-rula-sand px-5 py-2.5 text-sm font-medium hover:bg-rula-purple transition-colors"
         >
           Download PDF
         </button>
         <button
           type="button"
           onClick={handleReset}
-          className="inline-flex items-center rounded-full bg-white border border-teal-200 text-teal-700 px-5 py-2.5 text-sm font-medium hover:bg-teal-50 transition-colors"
+          className="inline-flex items-center rounded-full bg-white border border-rula-sp2 text-rula-purple px-5 py-2.5 text-sm font-medium hover:bg-rula-sp1 transition-colors"
         >
           Reset
         </button>

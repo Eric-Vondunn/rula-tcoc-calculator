@@ -19,7 +19,7 @@ import {
   Cell,
 } from 'recharts';
 
-const COLORS = ['#0d9488', '#0891b2', '#6366f1', '#d97706', '#059669', '#94a3b8'];
+const COLORS = ['#46219E', '#6C4CEA', '#AD99FF', '#F3D457', '#059669', '#3F4146'];
 
 export function PopulationOverview() {
   const { state, derived, updateClientInputs } = useCalculator();
@@ -67,7 +67,7 @@ export function PopulationOverview() {
               value={clientInputs.clientName}
               onChange={(e) => updateClientInputs({ clientName: e.target.value })}
               placeholder="Enter employer name"
-              className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+              className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-rula-mid focus:outline-none focus:ring-1 focus:ring-rula-mid"
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -111,7 +111,7 @@ export function PopulationOverview() {
           value={formatNumber(clientInputs.totalCoveredMembers)}
           tooltip="User input: total employees and covered dependents."
           icon={Users}
-          iconColor="text-teal-600"
+          iconColor="text-rula-sp3"
         />
         <MetricCard
           label="Estimated Adult Members"
@@ -119,7 +119,7 @@ export function PopulationOverview() {
           subtitle={`${(clientInputs.adultPercentage * 100).toFixed(0)}% of total`}
           tooltip="Total covered members × adult percentage (default 78%, industry benchmark)."
           icon={UserCheck}
-          iconColor="text-cyan-600"
+          iconColor="text-rula-light"
         />
         <MetricCard
           label="Conditions Evaluated"
@@ -127,12 +127,12 @@ export function PopulationOverview() {
           subtitle={`of ${populationResults.length} categories`}
           tooltip="Count of conditions where both prevalence and BH comorbidity benchmarks are available."
           icon={Heart}
-          iconColor="text-indigo-600"
+          iconColor="text-rula-mid"
         />
       </div>
 
       {/* Aggregate Totals */}
-      <Card className="border-teal-200 bg-gradient-to-br from-teal-50/50 to-white">
+      <Card className="border-rula-sp2 bg-gradient-to-br from-rula-sp1/50 to-white">
         <CardHeader className="pb-2">
           <CardTitle className="text-base">Aggregate Totals Across All Conditions</CardTitle>
           <CardDescription className="text-xs text-amber-700">
@@ -151,7 +151,7 @@ export function PopulationOverview() {
             </div>
             <div className="space-y-1">
               <p className="text-sm text-gray-500">Total Est. Untreated BH<InfoTip>Sum of (BH comorbidity × untreated rate). Untreated rate: ~57% (NIMH/NSDUH general population estimate).</InfoTip></p>
-              <p className="text-2xl font-bold text-teal-700 tracking-tight">{formatNumber(totalUntreated)}</p>
+              <p className="text-2xl font-bold text-rula-purple tracking-tight">{formatNumber(totalUntreated)}</p>
             </div>
           </div>
         </CardContent>

@@ -42,7 +42,7 @@ export function ActionPlanView({ model: m, plan: P, state, dispatch }: Props) {
         <button
           type="button"
           onClick={() => dispatch({ type: 'SET_ACTIVE_VIEW', value: 'v1' })}
-          className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-4 py-2.5 text-sm font-medium text-teal-700 hover:bg-teal-100 transition-colors"
+          className="inline-flex items-center gap-2 rounded-full border border-rula-sp2 bg-rula-sp1 px-4 py-2.5 text-sm font-medium text-rula-purple hover:bg-rula-sp2 transition-colors"
         >
           &larr; See awareness turn into care
         </button>
@@ -75,10 +75,10 @@ export function ActionPlanView({ model: m, plan: P, state, dispatch }: Props) {
         <p className="text-sm text-gray-500 mb-4">
           This is what working with Rula gives you: the launch kit, and four engagements across the year, one a quarter. Our data shows these are the moments that matter most, and together they create the minimum rhythm required to keep mental health visible all year.
         </p>
-        <div className="rounded-2xl bg-slate-800 text-white p-5">
+        <div className="rounded-2xl bg-rula-spruce text-white p-5">
           {MOM.map((q, i) => (
             <div key={i} className="flex items-baseline gap-3 py-2 border-b border-white/10 last:border-b-0">
-              <span className="text-xs font-bold tracking-wider uppercase text-teal-300 min-w-[28px]">{q.q}</span>
+              <span className="text-xs font-bold tracking-wider uppercase text-rula-yellow min-w-[28px]">{q.q}</span>
               <div>
                 <span className="font-medium">{q.t}</span>
                 <span className="text-xs text-gray-400 ml-2">{q.win.split(',')[0]}</span>
@@ -93,12 +93,12 @@ export function ActionPlanView({ model: m, plan: P, state, dispatch }: Props) {
         <h2 className="text-2xl font-semibold text-gray-900 mb-2">A year-round plan, established from the start</h2>
 
         <div className="flex items-center justify-between flex-wrap gap-3 mt-4 mb-3">
-          <span className="text-xs font-bold tracking-wider uppercase text-teal-700">The year at a glance</span>
+          <span className="text-xs font-bold tracking-wider uppercase text-rula-purple">The year at a glance</span>
           {MOM.some((_, i) => !!sugDate(i)) && (
             <button
               type="button"
               onClick={handleSuggestAll}
-              className="text-xs font-medium border border-teal-200 bg-white text-teal-700 rounded-full px-3 py-2 hover:bg-teal-50 transition-colors"
+              className="text-xs font-medium border border-rula-sp2 bg-white text-rula-purple rounded-full px-3 py-2 hover:bg-rula-sp1 transition-colors"
             >
               Use the recommended dates for all four
             </button>
@@ -121,17 +121,17 @@ export function ActionPlanView({ model: m, plan: P, state, dispatch }: Props) {
                 <button
                   type="button"
                   className={`w-full grid grid-cols-[40px_1fr_auto_auto] gap-3 items-center text-left border rounded-xl px-4 py-3 transition-colors ${
-                    isOpen ? 'bg-teal-50 border-teal-200' : 'bg-gray-50 border-gray-200 hover:border-teal-300 hover:bg-white'
+                    isOpen ? 'bg-rula-sp1 border-rula-sp2' : 'bg-gray-50 border-gray-200 hover:border-rula-light hover:bg-white'
                   } ${isOpen ? 'rounded-b-none' : ''}`}
                   onClick={() => dispatch({ type: 'SET_OPEN_QUARTER', value: isOpen ? null : i })}
                 >
-                  <span className="text-base font-semibold text-teal-700">{q.q}</span>
+                  <span className="text-base font-semibold text-rula-purple">{q.q}</span>
                   <div className="min-w-0">
                     <div className="text-sm font-semibold text-gray-900">{q.t}</div>
                     <div className="text-xs text-gray-500 mt-0.5">{lead}</div>
                   </div>
                   {L ? (
-                    <span className="text-xs font-bold text-teal-700 whitespace-nowrap">{human(L)}, {L.getFullYear()}</span>
+                    <span className="text-xs font-bold text-rula-purple whitespace-nowrap">{human(L)}, {L.getFullYear()}</span>
                   ) : (
                     <span className="text-xs text-gray-400 whitespace-nowrap">Date not set</span>
                   )}
@@ -157,7 +157,7 @@ export function ActionPlanView({ model: m, plan: P, state, dispatch }: Props) {
         </div>
 
         {clashes.map((c, ci) => (
-          <div key={ci} className="mt-3 rounded-xl bg-teal-50 border-l-4 border-l-teal-500 p-3 text-sm text-gray-700">
+          <div key={ci} className="mt-3 rounded-xl bg-rula-sp1 border-l-4 border-l-rula-mid p-3 text-sm text-gray-700">
             <strong>{c.a.q} and {c.b.q} overlap by {c.days} day{c.days === 1 ? '' : 's'}.</strong>{' '}
             {c.b.q} preparation opens on {human(c.b.from)}, before {c.a.q} closes on {human(c.a.to)}.
             Moving either launch by a fortnight clears it.
@@ -170,7 +170,7 @@ export function ActionPlanView({ model: m, plan: P, state, dispatch }: Props) {
         <button
           type="button"
           onClick={() => dispatch({ type: 'SET_ACTIVE_VIEW', value: 'v1' })}
-          className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-4 py-2.5 text-sm font-medium text-teal-700 hover:bg-teal-100 transition-colors"
+          className="inline-flex items-center gap-2 rounded-full border border-rula-sp2 bg-rula-sp1 px-4 py-2.5 text-sm font-medium text-rula-purple hover:bg-rula-sp2 transition-colors"
         >
           See awareness turn into care
         </button>
@@ -188,21 +188,21 @@ export function ActionPlanView({ model: m, plan: P, state, dispatch }: Props) {
             <Card key={mo.m} className="border-gray-200">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-xs font-bold tracking-wider uppercase text-teal-700">{mo.m}</h4>
+                  <h4 className="text-xs font-bold tracking-wider uppercase text-rula-purple">{mo.m}</h4>
                   <span className="text-xs text-gray-400">Q{mo.q + 1}</span>
                 </div>
                 {mo.items.map((it, ii) => {
                   const key = `mo_${mi}_${ii}`;
                   return (
-                    <label key={key} className="flex items-start gap-2 py-1 cursor-pointer hover:text-teal-700">
+                    <label key={key} className="flex items-start gap-2 py-1 cursor-pointer hover:text-rula-purple">
                       <input
                         type="checkbox"
                         checked={!!state.monthSelections[key]}
                         onChange={() => dispatch({ type: 'TOGGLE_MONTH', id: key })}
-                        className="mt-0.5 h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                        className="mt-0.5 h-4 w-4 rounded border-gray-300 text-rula-sp3 focus:ring-rula-mid"
                       />
-                      <span className={`text-xs leading-snug ${state.monthSelections[key] ? 'text-teal-700 font-medium' : 'text-gray-700'}`}>
-                        {it.t}{it.core && <span className="text-teal-600 font-bold ml-1">*</span>}
+                      <span className={`text-xs leading-snug ${state.monthSelections[key] ? 'text-rula-purple font-medium' : 'text-gray-700'}`}>
+                        {it.t}{it.core && <span className="text-rula-sp3 font-bold ml-1">*</span>}
                       </span>
                     </label>
                   );
@@ -219,7 +219,7 @@ export function ActionPlanView({ model: m, plan: P, state, dispatch }: Props) {
         <button
           type="button"
           onClick={() => dispatch({ type: 'SET_ACTIVE_VIEW', value: 'v1' })}
-          className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-4 py-2.5 text-sm font-medium text-teal-700 hover:bg-teal-100 transition-colors"
+          className="inline-flex items-center gap-2 rounded-full border border-rula-sp2 bg-rula-sp1 px-4 py-2.5 text-sm font-medium text-rula-purple hover:bg-rula-sp2 transition-colors"
         >
           See awareness turn into care
         </button>
@@ -255,7 +255,7 @@ export function ActionPlanView({ model: m, plan: P, state, dispatch }: Props) {
         <button
           type="button"
           onClick={() => dispatch({ type: 'SET_ACTIVE_VIEW', value: 'v1' })}
-          className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-4 py-2.5 text-sm font-medium text-teal-700 hover:bg-teal-100 transition-colors"
+          className="inline-flex items-center gap-2 rounded-full border border-rula-sp2 bg-rula-sp1 px-4 py-2.5 text-sm font-medium text-rula-purple hover:bg-rula-sp2 transition-colors"
         >
           See awareness turn into care
         </button>
@@ -275,7 +275,7 @@ export function ActionPlanView({ model: m, plan: P, state, dispatch }: Props) {
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {picked.map(t => (
-                    <span key={t} className="inline-flex items-center rounded-full border border-teal-200 bg-white px-3 py-1 text-xs font-medium text-teal-700">{t}</span>
+                    <span key={t} className="inline-flex items-center rounded-full border border-rula-sp2 bg-white px-3 py-1 text-xs font-medium text-rula-purple">{t}</span>
                   ))}
                 </div>
               </>
@@ -313,8 +313,8 @@ function QuarterDetail({
   const X = computeExtras(i, state);
 
   return (
-    <div className="border border-t-0 border-teal-200 rounded-b-xl bg-white p-5 space-y-4">
-      <div className="text-xs font-bold tracking-wider uppercase text-teal-700">
+    <div className="border border-t-0 border-rula-sp2 rounded-b-xl bg-white p-5 space-y-4">
+      <div className="text-xs font-bold tracking-wider uppercase text-rula-purple">
         {q.q}{state.confirmed[i] ? ', confirmed' : ''}
       </div>
       <h3 className="text-lg font-medium text-gray-900">{q.t}</h3>
@@ -327,14 +327,14 @@ function QuarterDetail({
         </div>
       ) : (
         <>
-          <div className="rounded-lg bg-teal-50 p-3 text-sm text-gray-700">
+          <div className="rounded-lg bg-rula-sp1 p-3 text-sm text-gray-700">
             <strong>{M.tp} touchpoint{M.tp === 1 ? '' : 's'}, led by {CH[M.lead!]?.s}.</strong>
             {M.tp === 1 && <em className="ml-1">One is the case the evidence says underperforms.</em>}
           </div>
           <div className="flex flex-wrap gap-2">
             {M.sel.map(id => (
               <span key={id} className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
-                id === M.lead ? 'bg-teal-700 text-white' : 'border border-teal-200 text-teal-700'
+                id === M.lead ? 'bg-rula-sp3 text-rula-sand' : 'border border-rula-sp2 text-rula-purple'
               }`}>{CH[id]?.s}</span>
             ))}
           </div>
@@ -346,20 +346,20 @@ function QuarterDetail({
 
       {X.topics.length > 0 && (
         <div className="rounded-lg bg-gray-50 p-3 text-xs text-gray-500">
-          <strong className="text-teal-700">Also this quarter:</strong> {andList(X.topics)}.
+          <strong className="text-rula-purple">Also this quarter:</strong> {andList(X.topics)}.
         </div>
       )}
 
       {/* Date input */}
       <div>
-        <label className="block text-xs font-bold tracking-wider uppercase text-teal-700 mb-1">
+        <label className="block text-xs font-bold tracking-wider uppercase text-rula-purple mb-1">
           Employee launch date
         </label>
         <input
           type="date"
           value={state.dates[i]}
           onChange={(e) => dispatch({ type: 'SET_DATE', quarter: i, value: e.target.value })}
-          className="w-full max-w-xs border border-gray-200 rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+          className="w-full max-w-xs border border-gray-200 rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-rula-mid focus:ring-2 focus:ring-rula-mid/20"
         />
       </div>
 
@@ -372,7 +372,7 @@ function QuarterDetail({
               dispatch({ type: 'SET_DATE', quarter: i, value: iso(sd) });
               dispatch({ type: 'SET_OPEN_QUARTER', value: i });
             }}
-            className="text-teal-600 font-medium hover:underline"
+            className="text-rula-sp3 font-medium hover:underline"
           >
             Use this date
           </button>
@@ -418,7 +418,7 @@ function MilestoneTable({
         </div>
       )}
       {meetings.length > 0 && (
-        <div className="rounded-lg bg-teal-50 border border-teal-200 p-3 text-xs text-teal-700">
+        <div className="rounded-lg bg-rula-sp1 border border-rula-sp2 p-3 text-xs text-rula-purple">
           <strong>{meetings.length} meeting{meetings.length === 1 ? '' : 's'} to put in the calendar:</strong>{' '}
           {andList(meetings.map(x => `${x.m.t.toLowerCase()} on ${human(x.d)}`))}
         </div>
@@ -431,12 +431,12 @@ function MilestoneTable({
         </div>
         {sch.map((x, si) => (
           <div key={si} className={`grid grid-cols-[1.05fr_0.62fr_1fr_1fr] gap-2 py-2 items-baseline text-xs border-b border-gray-100 ${
-            x.m.mt ? 'bg-teal-50 rounded-lg px-2 -mx-2 my-0.5' : ''
+            x.m.mt ? 'bg-rula-sp1 rounded-lg px-2 -mx-2 my-0.5' : ''
           } ${x.m.k === 0 ? 'font-semibold' : ''}`}>
             <span className={`font-semibold ${x.m.yd ? 'text-gray-900' : 'text-gray-500'}`}>
-              {x.m.t}{x.m.mt ? <span className="ml-1 text-[9px] font-bold tracking-wider uppercase bg-teal-600 text-white rounded-full px-1.5 py-0.5">Meeting</span> : ''}
+              {x.m.t}{x.m.mt ? <span className="ml-1 text-[9px] font-bold tracking-wider uppercase bg-rula-sp3 text-white rounded-full px-1.5 py-0.5">Meeting</span> : ''}
             </span>
-            <span className="font-bold text-teal-700 whitespace-nowrap">{human(x.d)}</span>
+            <span className="font-bold text-rula-purple whitespace-nowrap">{human(x.d)}</span>
             <span className="text-gray-500">{x.m.r}</span>
             <span className="text-gray-500">{x.m.e}</span>
           </div>
@@ -445,7 +445,7 @@ function MilestoneTable({
 
       {/* Dates to hold */}
       <div className="pt-2">
-        <div className="text-xs font-bold tracking-wider uppercase text-teal-700 mb-2">
+        <div className="text-xs font-bold tracking-wider uppercase text-rula-purple mb-2">
           Dates to hold, {holdDates.length} this quarter
         </div>
         {holdDates.map((x, hi) => (
@@ -466,7 +466,7 @@ function MilestoneTable({
           type="checkbox"
           checked={state.confirmed[i]}
           onChange={() => dispatch({ type: 'TOGGLE_CONFIRMED', quarter: i })}
-          className="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+          className="h-4 w-4 rounded border-gray-300 text-rula-sp3 focus:ring-rula-mid"
         />
         <span className="text-xs font-medium text-gray-700">Dates and owners confirmed for {MOM[i].t}</span>
       </label>
@@ -498,8 +498,8 @@ function ChannelGroup({
         {group.n && <p className="text-xs text-gray-500 mb-3">{group.n}</p>}
 
         {group.fixed ? (
-          <div className="rounded-lg bg-teal-50 border border-teal-200 p-3">
-            <div className="text-xs font-bold tracking-wider uppercase text-teal-700 mb-1">Always included</div>
+          <div className="rounded-lg bg-rula-sp1 border border-rula-sp2 p-3">
+            <div className="text-xs font-bold tracking-wider uppercase text-rula-purple mb-1">Always included</div>
             <div className="text-xs text-gray-500">Rula-managed email series, executive testimonial, and the four anchor moments.</div>
           </div>
         ) : (
@@ -510,10 +510,10 @@ function ChannelGroup({
                   type="checkbox"
                   checked={!!state.channelSelections[tac.id]}
                   onChange={() => dispatch({ type: 'TOGGLE_CHANNEL', id: tac.id })}
-                  className="mt-0.5 h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                  className="mt-0.5 h-4 w-4 rounded border-gray-300 text-rula-sp3 focus:ring-rula-mid"
                 />
                 <div className="min-w-0">
-                  <span className={`text-sm ${state.channelSelections[tac.id] ? 'text-teal-700 font-medium' : 'text-gray-700'}`}>{tac.t}</span>
+                  <span className={`text-sm ${state.channelSelections[tac.id] ? 'text-rula-purple font-medium' : 'text-gray-700'}`}>{tac.t}</span>
                   <span className="block text-xs text-gray-500 mt-0.5 leading-relaxed">{tac.n}</span>
                 </div>
               </label>
@@ -528,18 +528,18 @@ function ChannelGroup({
                       type="checkbox"
                       checked={!!state.addonSelections[ao.id]}
                       onChange={() => dispatch({ type: 'TOGGLE_ADDON', id: ao.id })}
-                      className="mt-0.5 h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                      className="mt-0.5 h-4 w-4 rounded border-gray-300 text-rula-sp3 focus:ring-rula-mid"
                     />
                     <div className="min-w-0">
-                      <span className={`text-sm ${state.addonSelections[ao.id] ? 'text-teal-700 font-medium' : 'text-gray-700'}`}>{ao.t}</span>
+                      <span className={`text-sm ${state.addonSelections[ao.id] ? 'text-rula-purple font-medium' : 'text-gray-700'}`}>{ao.t}</span>
                       <span className="block text-xs text-gray-500 mt-0.5 leading-relaxed">{ao.n}{ao.q ? ` ${ao.q}.` : ''}</span>
                     </div>
                   </label>
                 ))}
 
                 {/* Other ideas textarea */}
-                <div className="border-t border-dashed border-teal-200 pt-3 mt-2">
-                  <label className="block text-xs font-bold tracking-wider uppercase text-teal-700 mb-1">
+                <div className="border-t border-dashed border-rula-sp2 pt-3 mt-2">
+                  <label className="block text-xs font-bold tracking-wider uppercase text-rula-purple mb-1">
                     Something else?
                   </label>
                   <textarea
@@ -547,7 +547,7 @@ function ChannelGroup({
                     onChange={(e) => dispatch({ type: 'SET_OTHER_TEXT', value: e.target.value })}
                     placeholder="Your idea..."
                     rows={2}
-                    className="w-full border border-gray-200 rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 resize-y"
+                    className="w-full border border-gray-200 rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-rula-mid focus:ring-2 focus:ring-rula-mid/20 resize-y"
                   />
                 </div>
               </>

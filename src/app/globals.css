@@ -1,8 +1,26 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #fafaf9;
-  --color-foreground: #171717;
+  /* Page background & foreground */
+  --color-background: #F7F5EF;
+  --color-foreground: #003139;
+
+  /* Rula primary palette */
+  --color-rula-purple: #291551;
+  --color-rula-mid: #6C4CEA;
+  --color-rula-light: #AD99FF;
+  --color-rula-sand: #F7F5EF;
+  --color-rula-spruce: #003139;
+
+  /* Rula extended palette */
+  --color-rula-sp1: #E9E5FF;
+  --color-rula-sp2: #D4CAFF;
+  --color-rula-sp3: #46219E;
+  --color-rula-yellow: #F3D457;
+  --color-rula-dark-sand: #ECE8DD;
+  --color-rula-grey: #3F4146;
+
+  /* Fonts */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -73,8 +91,8 @@ input[type="number"] {
     border-color: #e5e7eb !important;
   }
 
-  [class*="border-teal"] {
-    border-color: #99f6e4 !important;
+  [class*="border-rula"] {
+    border-color: #D4CAFF !important;
   }
 
   /* Table formatting */
@@ -112,7 +130,7 @@ input[type="number"] {
   }
 
   /* Teal badge backgrounds */
-  [class*="bg-teal"], [class*="bg-amber"], [class*="bg-emerald"] {
+  [class*="bg-rula"], [class*="bg-amber"], [class*="bg-emerald"] {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }

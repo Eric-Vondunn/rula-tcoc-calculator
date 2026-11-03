@@ -21,7 +21,7 @@ import {
   Cell,
 } from 'recharts';
 
-const COLORS = ['#0d9488', '#0891b2', '#6366f1', '#d97706', '#059669', '#94a3b8'];
+const COLORS = ['#46219E', '#6C4CEA', '#AD99FF', '#F3D457', '#059669', '#3F4146'];
 
 export function FinancialImpact() {
   const { state, derived, updateClientInputs } = useCalculator();
@@ -125,7 +125,7 @@ export function FinancialImpact() {
       </Card>
 
       {/* Aggregate Financial Totals */}
-      <Card className="border-teal-200 bg-gradient-to-br from-teal-50/50 to-white">
+      <Card className="border-rula-sp2 bg-gradient-to-br from-rula-sp1/50 to-white">
         <CardHeader className="pb-2">
           <CardTitle className="text-base">Aggregate Financial Impact</CardTitle>
           <CardDescription className="text-xs text-amber-700">
@@ -145,7 +145,7 @@ export function FinancialImpact() {
             <div className="space-y-1">
               <p className="text-sm text-gray-500">Total Potentially Avoidable<InfoTip>Modeled spending × recoverable cost percentage (user-configured).</InfoTip></p>
               {hasAvoidable ? (
-                <p className="text-2xl font-bold text-teal-700 tracking-tight">{formatCurrency(totalAvoidableSpending)}</p>
+                <p className="text-2xl font-bold text-rula-purple tracking-tight">{formatCurrency(totalAvoidableSpending)}</p>
               ) : (
                 <p className="text-sm text-gray-400 italic">Set recoverable % to calculate</p>
               )}
@@ -198,7 +198,7 @@ export function FinancialImpact() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <TrendingDown className="h-5 w-5 text-teal-600" />
+            <TrendingDown className="h-5 w-5 text-rula-sp3" />
             Treated vs Untreated: Per-Person Annual Cost
           </CardTitle>
           <CardDescription>
@@ -213,7 +213,7 @@ export function FinancialImpact() {
                 <tr className="border-b border-gray-200">
                   <th className="text-left py-3 px-3 font-medium text-gray-500" rowSpan={2}>Cost Component</th>
                   <th className="text-center py-2 px-3 font-medium text-red-600 border-b border-red-100" colSpan={1}>Untreated</th>
-                  <th className="text-center py-2 px-3 font-medium text-teal-600 border-b border-teal-100" colSpan={1}>Treated (with Rula)</th>
+                  <th className="text-center py-2 px-3 font-medium text-rula-sp3 border-b border-rula-sp1" colSpan={1}>Treated (with Rula)</th>
                   <th className="text-center py-2 px-3 font-medium text-gray-500" rowSpan={2}>Savings</th>
                 </tr>
               </thead>
@@ -252,7 +252,7 @@ export function FinancialImpact() {
                           <td className="py-3 px-3 text-right text-red-700 font-medium">
                             {formatCurrency(row.untreated)}
                           </td>
-                          <td className="py-3 px-3 text-right text-teal-700 font-medium">
+                          <td className="py-3 px-3 text-right text-rula-purple font-medium">
                             {formatCurrency(row.treated)}
                           </td>
                           <td className="py-3 px-3 text-right text-green-700 font-medium">
@@ -263,7 +263,7 @@ export function FinancialImpact() {
                       <tr className="border-b border-gray-100">
                         <td className="py-3 px-3 text-gray-700">Rula Treatment Cost<InfoTip>$130/session × 10 avg sessions = $1,300/person.</InfoTip></td>
                         <td className="py-3 px-3 text-right text-gray-400">—</td>
-                        <td className="py-3 px-3 text-right text-teal-700 font-medium">
+                        <td className="py-3 px-3 text-right text-rula-purple font-medium">
                           {formatCurrency(r.rulaTreatmentCost)}
                         </td>
                         <td className="py-3 px-3 text-right text-gray-400">—</td>
@@ -273,7 +273,7 @@ export function FinancialImpact() {
                         <td className="py-3 px-3 text-right font-bold text-red-700">
                           {formatCurrency(untreatedTotal)}
                         </td>
-                        <td className="py-3 px-3 text-right font-bold text-teal-700">
+                        <td className="py-3 px-3 text-right font-bold text-rula-purple">
                           {formatCurrency(treatedTotal)}
                         </td>
                         <td className="py-3 px-3 text-right font-bold text-green-700">
@@ -439,7 +439,7 @@ export function FinancialImpact() {
                         ? formatCurrency(r.modeledAnnualSpending)
                         : <span className="text-gray-400 italic">N/A</span>}
                     </td>
-                    <td className="py-3 px-4 text-right text-teal-700 font-semibold">
+                    <td className="py-3 px-4 text-right text-rula-purple font-semibold">
                       {r.potentiallyAvoidableSpending !== null
                         ? formatCurrency(r.potentiallyAvoidableSpending)
                         : <span className="text-gray-400 italic text-xs">Set recoverable %</span>}
@@ -459,7 +459,7 @@ export function FinancialImpact() {
                   <td className="py-3 px-4 text-right font-bold text-gray-900">
                     {formatCurrency(totalModeledSpending)}
                   </td>
-                  <td className="py-3 px-4 text-right font-bold text-teal-700">
+                  <td className="py-3 px-4 text-right font-bold text-rula-purple">
                     {hasAvoidable
                       ? formatCurrency(totalAvoidableSpending)
                       : <span className="text-gray-400 italic text-xs">Set recoverable %</span>}

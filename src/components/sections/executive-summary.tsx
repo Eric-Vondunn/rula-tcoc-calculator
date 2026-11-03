@@ -94,10 +94,10 @@ export function ExecutiveSummary() {
   return (
     <div className="space-y-6">
       {/* Executive Header */}
-      <Card className="bg-gradient-to-br from-teal-50 to-white border-teal-200">
+      <Card className="bg-gradient-to-br from-rula-sp1 to-white border-rula-sp2">
         <CardContent className="p-8">
           <div className="space-y-2">
-            <p className="text-sm font-medium text-teal-700 uppercase tracking-wide">
+            <p className="text-sm font-medium text-rula-purple uppercase tracking-wide">
               Executive Summary
             </p>
             <h2 className="text-2xl font-bold text-gray-900">
@@ -131,7 +131,7 @@ export function ExecutiveSummary() {
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="no-print ml-auto inline-flex items-center rounded-full bg-teal-700 text-white px-5 py-2.5 text-sm font-medium hover:bg-teal-800 transition-colors"
+                className="no-print ml-auto inline-flex items-center rounded-full bg-rula-sp3 text-rula-sand px-5 py-2.5 text-sm font-medium hover:bg-rula-purple transition-colors"
               >
                 Download PDF
               </button>
@@ -151,7 +151,7 @@ export function ExecutiveSummary() {
       </Card>
 
       {/* Aggregate Totals */}
-      <Card className="border-teal-200">
+      <Card className="border-rula-sp2">
         <CardHeader className="pb-2">
           <CardTitle>Key Figures</CardTitle>
           <p className="text-xs text-amber-700 mt-1">
@@ -170,11 +170,11 @@ export function ExecutiveSummary() {
             </div>
             <div className="space-y-1">
               <p className="text-sm text-gray-500">Combined BH Comorbidity<InfoTip>Sum of (est. with condition × BH comorbidity rate). Rates: 20–25% (Anderson 2001, Lichtman 2014, Mitchell 2011).</InfoTip></p>
-              <p className="text-2xl font-bold text-indigo-700">{formatNumber(totalWithBhComorbidity)}</p>
+              <p className="text-2xl font-bold text-rula-mid">{formatNumber(totalWithBhComorbidity)}</p>
             </div>
             <div className="space-y-1">
               <p className="text-sm text-gray-500">Combined Untreated BH<InfoTip>Sum of (BH comorbidity × 57% untreated rate). Source: NIMH/NSDUH.</InfoTip></p>
-              <p className="text-2xl font-bold text-teal-700">{formatNumber(totalUntreated)}</p>
+              <p className="text-2xl font-bold text-rula-purple">{formatNumber(totalUntreated)}</p>
             </div>
             <div className="space-y-1">
               <p className="text-sm text-gray-500">Combined Modeled Spending<InfoTip>Sum of (untreated count × $10,000 incremental cost/person). Source: IBI.</InfoTip></p>
@@ -311,10 +311,10 @@ export function ExecutiveSummary() {
                   <td className="py-3 px-4 text-right font-bold text-gray-900">
                     {formatNumber(totalWithCondition)}
                   </td>
-                  <td className="py-3 px-4 text-right font-bold text-indigo-700">
+                  <td className="py-3 px-4 text-right font-bold text-rula-mid">
                     {formatNumber(totalWithBhComorbidity)}
                   </td>
-                  <td className="py-3 px-4 text-right font-bold text-teal-700">
+                  <td className="py-3 px-4 text-right font-bold text-rula-purple">
                     {formatNumber(totalUntreated)}
                   </td>
                   <td className="py-3 px-4 text-right font-bold text-gray-900">
@@ -514,7 +514,7 @@ export function ExecutiveSummary() {
                     <tr className="border-b border-gray-200">
                       <th className="text-left py-3 px-4 font-medium text-gray-500">Cost Component</th>
                       <th className="text-right py-3 px-4 font-medium text-red-600">Untreated</th>
-                      <th className="text-right py-3 px-4 font-medium text-teal-600">Treated (Rula)</th>
+                      <th className="text-right py-3 px-4 font-medium text-rula-sp3">Treated (Rula)</th>
                       <th className="text-right py-3 px-4 font-medium text-green-600">Savings</th>
                     </tr>
                   </thead>
@@ -522,31 +522,31 @@ export function ExecutiveSummary() {
                     <tr className="border-b border-gray-100">
                       <td className="py-3 px-4 text-gray-700">Incremental Medical Claims</td>
                       <td className="py-3 px-4 text-right text-red-700 font-medium">{formatCurrency(r.untreatedMedicalClaims)}</td>
-                      <td className="py-3 px-4 text-right text-teal-700 font-medium">{formatCurrency(r.treatedMedicalClaims)}</td>
+                      <td className="py-3 px-4 text-right text-rula-purple font-medium">{formatCurrency(r.treatedMedicalClaims)}</td>
                       <td className="py-3 px-4 text-right text-green-700 font-medium">{formatCurrency(r.untreatedMedicalClaims - r.treatedMedicalClaims)}</td>
                     </tr>
                     <tr className="border-b border-gray-100">
                       <td className="py-3 px-4 text-gray-700">Absenteeism / Productivity</td>
                       <td className="py-3 px-4 text-right text-red-700 font-medium">{formatCurrency(r.untreatedAbsenteeismCost)}</td>
-                      <td className="py-3 px-4 text-right text-teal-700 font-medium">{formatCurrency(r.treatedAbsenteeismCost)}</td>
+                      <td className="py-3 px-4 text-right text-rula-purple font-medium">{formatCurrency(r.treatedAbsenteeismCost)}</td>
                       <td className="py-3 px-4 text-right text-green-700 font-medium">{formatCurrency(r.untreatedAbsenteeismCost - r.treatedAbsenteeismCost)}</td>
                     </tr>
                     <tr className="border-b border-gray-100">
                       <td className="py-3 px-4 text-gray-700">Short-Term Disability</td>
                       <td className="py-3 px-4 text-right text-red-700 font-medium">{formatCurrency(r.untreatedStdCost)}</td>
-                      <td className="py-3 px-4 text-right text-teal-700 font-medium">{formatCurrency(r.treatedStdCost)}</td>
+                      <td className="py-3 px-4 text-right text-rula-purple font-medium">{formatCurrency(r.treatedStdCost)}</td>
                       <td className="py-3 px-4 text-right text-green-700 font-medium">{formatCurrency(r.untreatedStdCost - r.treatedStdCost)}</td>
                     </tr>
                     <tr className="border-b border-gray-100">
                       <td className="py-3 px-4 text-gray-700">Rula Treatment Cost</td>
                       <td className="py-3 px-4 text-right text-gray-400">—</td>
-                      <td className="py-3 px-4 text-right text-teal-700 font-medium">{formatCurrency(r.rulaTreatmentCost)}</td>
+                      <td className="py-3 px-4 text-right text-rula-purple font-medium">{formatCurrency(r.rulaTreatmentCost)}</td>
                       <td className="py-3 px-4 text-right text-gray-400">—</td>
                     </tr>
                     <tr className="border-t-2 border-gray-300 bg-gray-50">
                       <td className="py-3 px-4 font-bold text-gray-900">Total Per Person / Year</td>
                       <td className="py-3 px-4 text-right font-bold text-red-700">{formatCurrency(r.untreatedTotalCost)}</td>
-                      <td className="py-3 px-4 text-right font-bold text-teal-700">{formatCurrency(r.treatedTotalCost)}</td>
+                      <td className="py-3 px-4 text-right font-bold text-rula-purple">{formatCurrency(r.treatedTotalCost)}</td>
                       <td className="py-3 px-4 text-right font-bold text-green-700">{formatCurrency(r.annualSavingsPerPerson)}</td>
                     </tr>
                   </tbody>
@@ -558,7 +558,7 @@ export function ExecutiveSummary() {
       </Card>
 
       {/* Proposed Rula Engagement Plan */}
-      <Card className="border-teal-200 print-break-before">
+      <Card className="border-rula-sp2 print-break-before">
         <CardHeader>
           <CardTitle>Proposed Rula Engagement Plan</CardTitle>
           <p className="text-sm text-gray-500 mt-1">
@@ -576,11 +576,11 @@ export function ExecutiveSummary() {
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-gray-500">Projected care starts<InfoTip>Headcount × engagement rate. Rate interpolated geometrically between 0.15% (employer-only) and 0.81% (full plan) based on channel selections.</InfoTip></p>
-                <p className="text-2xl font-bold text-teal-700">{ppl(projectedCareStarts)}</p>
+                <p className="text-2xl font-bold text-rula-purple">{ppl(projectedCareStarts)}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-gray-500">Annual cost exposure addressed<InfoTip>Projected care starts × $9,450 per affected employee.</InfoTip></p>
-                <p className="text-2xl font-bold text-teal-700">{usd(projectedCostAddressed)}</p>
+                <p className="text-2xl font-bold text-rula-purple">{usd(projectedCostAddressed)}</p>
               </div>
             </div>
             <p className="mt-2 text-xs text-gray-400">
@@ -636,7 +636,7 @@ export function ExecutiveSummary() {
                         </td>
                         <td className="py-2 px-3">
                           {mapState.confirmed[i] ? (
-                            <span className="inline-flex items-center rounded-full bg-teal-100 px-2.5 py-0.5 text-xs font-medium text-teal-800">Confirmed</span>
+                            <span className="inline-flex items-center rounded-full bg-rula-sp1 px-2.5 py-0.5 text-xs font-medium text-rula-purple">Confirmed</span>
                           ) : dateStr ? (
                             <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">Proposed</span>
                           ) : (
