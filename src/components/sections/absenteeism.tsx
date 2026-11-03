@@ -195,7 +195,7 @@ export function Absenteeism() {
                         <td className="py-3 px-3 text-right font-semibold text-amber-600">{formatCurrency(r.rulaTreatmentCost)}</td>
                         <td className="py-3 px-3 text-right font-semibold text-amber-600">({formatCurrency(r.rulaTreatmentCost)})</td>
                       </tr>
-                      <tr className="border-t-2 border-gray-300 bg-gray-50">
+                      <tr className="border-t-2 border-rula-sp2 bg-rula-sp1">
                         <td className="py-3 px-3 font-bold text-gray-900">Total Annual Cost Per Person</td>
                         <td className="py-3 px-3 text-right font-bold text-red-700">{formatCurrency(r.untreatedTotalCost)}</td>
                         <td className="py-3 px-3 text-right font-bold text-emerald-700">{formatCurrency(r.treatedTotalCost)}</td>
@@ -324,7 +324,7 @@ export function Absenteeism() {
                   </tr>
                 ))}
                 {/* Totals */}
-                <tr className="border-t-2 border-gray-300 bg-gray-50">
+                <tr className="border-t-2 border-rula-sp2 bg-rula-sp1">
                   <td className="py-3 px-3 font-bold text-gray-900">
                     Combined Total
                     <span className="block text-xs font-normal text-amber-700">Includes overlap</span>

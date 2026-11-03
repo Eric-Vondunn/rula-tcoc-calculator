@@ -26,7 +26,7 @@ export function Navigation() {
   const { state, setActiveTab } = useCalculator();
 
   return (
-    <nav className="border-b border-gray-200 bg-white">
+    <nav className="border-b border-rula-sp2 bg-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex space-x-1 overflow-x-auto pb-px">
           {navItems.map((item) => {

@@ -268,7 +268,7 @@ export function FinancialImpact() {
                         </td>
                         <td className="py-3 px-3 text-right text-gray-400">—</td>
                       </tr>
-                      <tr className="border-t-2 border-gray-300 bg-gray-50">
+                      <tr className="border-t-2 border-rula-sp2 bg-rula-sp1">
                         <td className="py-3 px-3 font-bold text-gray-900">Total Per Person / Year</td>
                         <td className="py-3 px-3 text-right font-bold text-red-700">
                           {formatCurrency(untreatedTotal)}
@@ -334,7 +334,7 @@ export function FinancialImpact() {
                     </td>
                   </tr>
                 ))}
-                <tr className="border-t-2 border-gray-300 bg-gray-50">
+                <tr className="border-t-2 border-rula-sp2 bg-rula-sp1">
                   <td className="py-3 px-3 font-bold text-gray-900">
                     Combined Total
                     <span className="block text-xs font-normal text-amber-700">Includes overlap</span>
@@ -447,7 +447,7 @@ export function FinancialImpact() {
                   </tr>
                 ))}
                 {/* Totals Row */}
-                <tr className="border-t-2 border-gray-300 bg-gray-50">
+                <tr className="border-t-2 border-rula-sp2 bg-rula-sp1">
                   <td className="py-3 px-4 font-bold text-gray-900">
                     Combined Total
                     <span className="block text-xs font-normal text-amber-700">Includes overlap</span>

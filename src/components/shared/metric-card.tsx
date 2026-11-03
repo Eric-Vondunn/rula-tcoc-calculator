@@ -40,7 +40,7 @@ export function MetricCard({
             {subtitle && <p className="text-xs text-gray-400">{subtitle}</p>}
           </div>
           {Icon && (
-            <div className={cn('rounded-lg bg-gray-50 p-2', iconColor)}>
+            <div className={cn('rounded-lg bg-rula-sp1 p-2', iconColor)}>
               <Icon className="h-5 w-5" />
             </div>
           )}

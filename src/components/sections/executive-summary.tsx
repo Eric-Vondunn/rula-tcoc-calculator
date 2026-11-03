@@ -303,7 +303,7 @@ export function ExecutiveSummary() {
                   );
                 })}
                 {/* Totals Row */}
-                <tr className="border-t-2 border-gray-300 bg-gray-50">
+                <tr className="border-t-2 border-rula-sp2 bg-rula-sp1">
                   <td className="py-3 px-4 font-bold text-gray-900">
                     Combined Total
                     <span className="block text-xs font-normal text-amber-700">Includes overlap</span>
@@ -376,7 +376,7 @@ export function ExecutiveSummary() {
                     );
                   })}
                   {/* Totals Row */}
-                  <tr className="border-t-2 border-gray-300 bg-gray-50">
+                  <tr className="border-t-2 border-rula-sp2 bg-rula-sp1">
                     <td className="py-3 px-4 font-bold text-gray-900">
                       Combined Total
                       <span className="block text-xs font-normal text-amber-700">Includes overlap</span>
@@ -462,7 +462,7 @@ export function ExecutiveSummary() {
                     </tr>
                   );
                 })}
-                <tr className="border-t-2 border-gray-300 bg-gray-50">
+                <tr className="border-t-2 border-rula-sp2 bg-rula-sp1">
                   <td className="py-3 px-3 font-bold text-gray-900">
                     Combined Total
                     <span className="block text-xs font-normal text-amber-700">Includes overlap</span>
@@ -543,7 +543,7 @@ export function ExecutiveSummary() {
                       <td className="py-3 px-4 text-right text-rula-purple font-medium">{formatCurrency(r.rulaTreatmentCost)}</td>
                       <td className="py-3 px-4 text-right text-gray-400">—</td>
                     </tr>
-                    <tr className="border-t-2 border-gray-300 bg-gray-50">
+                    <tr className="border-t-2 border-rula-sp2 bg-rula-sp1">
                       <td className="py-3 px-4 font-bold text-gray-900">Total Per Person / Year</td>
                       <td className="py-3 px-4 text-right font-bold text-red-700">{formatCurrency(r.untreatedTotalCost)}</td>
                       <td className="py-3 px-4 text-right font-bold text-rula-purple">{formatCurrency(r.treatedTotalCost)}</td>

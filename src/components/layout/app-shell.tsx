@@ -32,7 +32,7 @@ export function AppShell() {
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
         <ActiveSection />
       </main>
-      <footer className="border-t border-gray-200 bg-white py-4 mt-8">
+      <footer className="border-t border-rula-sp2 bg-rula-sp1 py-4 mt-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <p className="text-xs text-gray-400 text-center">
             RULA Behavioral Health Total Cost of Care Calculator. All financial estimates are modeled
