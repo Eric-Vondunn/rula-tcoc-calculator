@@ -35,7 +35,7 @@ export function readAuthErrorFromUrl(): string | null {
   const description = params.get('error_description');
   if (!code && !description && !params.get('error')) return null;
   if (code === 'otp_expired') {
-    return 'That sign-in link has expired or was already used. Some work email systems open links to scan them, which uses them up. Request a new link, or enter the 6-digit code from the email instead.';
+    return 'That sign-in link has expired or was already used. Some work email systems open links to scan them, which uses them up. Request a new email and enter the 6-digit code instead.';
   }
   return description ? description.replace(/\+/g, ' ') : 'Sign-in failed. Please request a new link.';
 }

@@ -92,7 +92,7 @@ function SignInDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o:
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         title="Sign in to save clients"
-        description={`Saved clients are shared with your team. Sign in with your @${ALLOWED_EMAIL_DOMAIN} email and we'll email you a link and a 6-digit code.`}
+        description={`Saved clients are shared with your team. Sign in with your @${ALLOWED_EMAIL_DOMAIN} email and we'll email you a 6-digit code.`}
       >
         <SignInForm />
       </DialogContent>
@@ -151,8 +151,8 @@ function SignInForm() {
       <form onSubmit={verify} className="space-y-4">
         {!error && (
           <div className="rounded-lg bg-rula-sp1 p-4 text-sm text-rula-purple">
-            We sent an email to <strong>{email}</strong>. Click the link in it, or enter the 6-digit code below.
-            The link works in any browser.
+            We sent a 6-digit code to <strong>{email}</strong>. Enter it below. It can take a minute to arrive,
+            so check spam if you don&apos;t see it.
           </div>
         )}
         <div className="space-y-1.5">
@@ -216,7 +216,7 @@ function SignInForm() {
         </button>
         <Button type="submit" disabled={busy}>
           {busy && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
-          Send sign-in email
+          Email me a code
         </Button>
       </div>
     </form>
