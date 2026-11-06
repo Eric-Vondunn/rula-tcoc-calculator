@@ -12,6 +12,7 @@ import { conditionBenchmarks } from '@/data/benchmarks';
 import { computeModel, computePlan, rateOf, ppl, usd, pct, longDate, parseYmd, schedule } from '@/components/sections/mutual-action-plan/calculations';
 import { TAC, MOM, MONTHS, ADDONS, CH } from '@/components/sections/mutual-action-plan/constants';
 import { FollowUpEmail } from '@/components/sections/follow-up-email';
+import { OptInEmail } from '@/components/sections/opt-in-email';
 import { InfoTip } from '@/components/shared/info-tip';
 
 export function ExecutiveSummary() {
@@ -758,6 +759,22 @@ export function ExecutiveSummary() {
           engagementMultiplier={mapPlan.mult}
           selectedChannelCount={mapPlan.chan}
           selectedChannelNames={TAC.filter((t) => mapState.channelSelections[t.id]).map((t) => t.t)}
+          quarterDates={MOM.map((m, i) => ({
+            quarter: m.q,
+            moment: m.t,
+            date: parseYmd(mapState.dates[i]),
+            confirmed: mapState.confirmed[i],
+          }))}
+        />
+      </div>
+
+      {/* Opt-In Email Generator */}
+      <div className="no-print">
+        <OptInEmail
+          clientName={clientName}
+          headcount={mapState.headcount}
+          selectedChannelNames={TAC.filter((t) => mapState.channelSelections[t.id]).map((t) => t.t)}
+          selectedAddonNames={ADDONS.filter((a) => mapState.addonSelections[a.id]).map((a) => a.t)}
           quarterDates={MOM.map((m, i) => ({
             quarter: m.q,
             moment: m.t,

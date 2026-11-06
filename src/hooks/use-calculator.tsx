@@ -29,7 +29,7 @@ import {
 
 const defaultMapState: MapState = {
   employerName: '[Employer Name]',
-  headcount: 1000,
+  headcount: defaultClientInputs.employeeCount,
   activeView: 'v1',
   channelSelections: { t_email: true },
   monthSelections: {},
@@ -106,11 +106,17 @@ function reduceMapAction(state: MapState, action: MapAction): MapState {
 
 function reducer(state: CalculatorState, action: Action): CalculatorState {
   switch (action.type) {
-    case 'UPDATE_CLIENT_INPUTS':
-      return {
-        ...state,
-        clientInputs: { ...state.clientInputs, ...action.payload },
-      };
+    case 'UPDATE_CLIENT_INPUTS': {
+      const clientInputs = { ...state.clientInputs, ...action.payload };
+      // Keep the Engagement Plan headcount in step with the employee count,
+      // unless it has been edited separately on the Engagement Plan tab.
+      const headcountFollowsEmployees = state.mapState.headcount === state.clientInputs.employeeCount;
+      const mapState =
+        headcountFollowsEmployees && clientInputs.employeeCount !== state.clientInputs.employeeCount
+          ? { ...state.mapState, headcount: clientInputs.employeeCount }
+          : state.mapState;
+      return { ...state, clientInputs, mapState };
+    }
     case 'UPDATE_SCENARIO':
       return {
         ...state,
@@ -129,8 +135,13 @@ function reducer(state: CalculatorState, action: Action): CalculatorState {
       };
     case 'SET_ACTIVE_TAB':
       return { ...state, activeTab: action.payload };
-    case 'MAP_ACTION':
-      return { ...state, mapState: reduceMapAction(state.mapState, action.payload) };
+    case 'MAP_ACTION': {
+      const mapState = reduceMapAction(state.mapState, action.payload);
+      // Resetting the Engagement Plan re-links its headcount to the employee count.
+      return action.payload.type === 'RESET'
+        ? { ...state, mapState: { ...mapState, headcount: state.clientInputs.employeeCount } }
+        : { ...state, mapState };
+    }
     case 'RESET_DEFAULTS':
       return {
         clientInputs: { ...defaultClientInputs },
@@ -141,7 +152,10 @@ function reducer(state: CalculatorState, action: Action): CalculatorState {
         },
         absenteeismInputs: { ...defaultAbsenteeismInputs },
         activeTab: state.activeTab,
-        mapState: state.mapState,
+        mapState:
+          state.mapState.headcount === state.clientInputs.employeeCount
+            ? { ...state.mapState, headcount: defaultClientInputs.employeeCount }
+            : state.mapState,
       };
     default:
       return state;

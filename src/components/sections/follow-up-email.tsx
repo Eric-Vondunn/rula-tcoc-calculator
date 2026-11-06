@@ -1,14 +1,15 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatNumber, formatCurrency } from '@/lib/utils';
+import { CopyableEmail } from '@/components/shared/copyable-email';
 
 // ============================================================
 // Types
 // ============================================================
 
-interface QuarterDate {
+export interface QuarterDate {
   quarter: string;
   moment: string;
   date: Date | null;
@@ -225,28 +226,10 @@ function generateEmployerEmail(p: FollowUpEmailProps): { subject: string; body: 
 
 export function FollowUpEmail(props: FollowUpEmailProps) {
   const [version, setVersion] = useState<EmailVersion>('consultant');
-  const [copiedSubject, setCopiedSubject] = useState(false);
-  const [copiedBody, setCopiedBody] = useState(false);
-
   const consultantEmail = useMemo(() => generateConsultantEmail(props), [props]);
   const employerEmail = useMemo(() => generateEmployerEmail(props), [props]);
 
   const email = version === 'consultant' ? consultantEmail : employerEmail;
-
-  const handleCopy = useCallback(async (text: string, type: 'subject' | 'body') => {
-    try {
-      await navigator.clipboard.writeText(text);
-      if (type === 'subject') {
-        setCopiedSubject(true);
-        setTimeout(() => setCopiedSubject(false), 2000);
-      } else {
-        setCopiedBody(true);
-        setTimeout(() => setCopiedBody(false), 2000);
-      }
-    } catch {
-      // clipboard API may not be available in some contexts
-    }
-  }, []);
 
   return (
     <Card className="border-gray-200">
@@ -283,34 +266,7 @@ export function FollowUpEmail(props: FollowUpEmailProps) {
           </button>
         </div>
 
-        {/* Subject line */}
-        <div className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5">
-          <span className="text-xs font-medium text-gray-500 uppercase tracking-wide shrink-0">Subject</span>
-          <span className="text-sm text-gray-900 flex-1 truncate">{email.subject}</span>
-          <button
-            type="button"
-            onClick={() => handleCopy(email.subject, 'subject')}
-            className="shrink-0 text-xs font-medium text-rula-sp3 hover:text-rula-purple transition-colors"
-          >
-            {copiedSubject ? 'Copied!' : 'Copy'}
-          </button>
-        </div>
-
-        {/* Email body */}
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap max-h-96 overflow-y-auto">
-          {email.body}
-        </div>
-
-        {/* Copy button */}
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={() => handleCopy(email.body, 'body')}
-            className="inline-flex items-center rounded-full bg-rula-sp3 text-rula-sand px-5 py-2.5 text-sm font-medium hover:bg-rula-purple transition-colors"
-          >
-            {copiedBody ? 'Copied!' : 'Copy Email'}
-          </button>
-        </div>
+        <CopyableEmail subject={email.subject} body={email.body} />
       </CardContent>
     </Card>
   );

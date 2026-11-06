@@ -12,21 +12,17 @@ export function MutualActionPlan() {
   const state = calcState.mapState;
   const dispatch = mapDispatch;
 
-  // Sync employer name and headcount from calculator inputs on first mount
+  // Sync employer name from calculator inputs on first mount (headcount is kept in sync by the calculator state)
   const didSync = useRef(false);
   useEffect(() => {
     if (!didSync.current) {
       didSync.current = true;
       const name = calcState.clientInputs.clientName || '[Employer Name]';
-      const heads = calcState.clientInputs.employeeCount;
       if (state.employerName === '[Employer Name]') {
         dispatch({ type: 'SET_EMPLOYER_NAME', value: name });
       }
-      if (state.headcount === 1000) {
-        dispatch({ type: 'SET_HEADCOUNT', value: heads });
-      }
     }
-  }, [calcState.clientInputs, state.employerName, state.headcount, dispatch]);
+  }, [calcState.clientInputs, state.employerName, dispatch]);
 
   const model = useMemo(() => computeModel(state.headcount), [state.headcount]);
   const plan = useMemo(() => computePlan(state), [state]);
