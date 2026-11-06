@@ -14,6 +14,7 @@ import type {
   TreatedVsUntreatedCost,
 } from '@/types';
 import type { MapState, MapAction } from '@/components/sections/mutual-action-plan/types';
+import type { ClientSnapshot } from '@/lib/clients/repository';
 import { defaultClientInputs, defaultScenarios, defaultAbsenteeismInputs, absenteeismBenchmarks } from '@/data/defaults';
 import { conditionBenchmarks, costBenchmarks, getCostBenchmark } from '@/data/benchmarks';
 import { calculateAllConditions } from '@/lib/engine/population';
@@ -41,7 +42,7 @@ const defaultMapState: MapState = {
   otherText: '',
 };
 
-interface CalculatorState {
+export interface CalculatorState {
   clientInputs: ClientInputs;
   scenarios: ScenarioSet;
   absenteeismInputs: AbsenteeismInputs;
@@ -55,7 +56,9 @@ type Action =
   | { type: 'UPDATE_ABSENTEEISM_INPUTS'; payload: Partial<AbsenteeismInputs> }
   | { type: 'SET_ACTIVE_TAB'; payload: string }
   | { type: 'MAP_ACTION'; payload: MapAction }
-  | { type: 'RESET_DEFAULTS' };
+  | { type: 'RESET_DEFAULTS' }
+  | { type: 'LOAD_SNAPSHOT'; payload: ClientSnapshot }
+  | { type: 'NEW_CLIENT' };
 
 function reduceMapAction(state: MapState, action: MapAction): MapState {
   switch (action.type) {
@@ -157,9 +160,51 @@ function reducer(state: CalculatorState, action: Action): CalculatorState {
             ? { ...state.mapState, headcount: defaultClientInputs.employeeCount }
             : state.mapState,
       };
+    case 'LOAD_SNAPSHOT':
+      return applySnapshot(state, action.payload);
+    case 'NEW_CLIENT':
+      return {
+        ...state,
+        clientInputs: { ...defaultClientInputs },
+        scenarios: {
+          conservative: { ...defaultScenarios.conservative },
+          base: { ...defaultScenarios.base },
+          optimistic: { ...defaultScenarios.optimistic },
+        },
+        absenteeismInputs: { ...defaultAbsenteeismInputs },
+        mapState: { ...defaultMapState },
+        activeTab: 'population',
+      };
     default:
       return state;
   }
+}
+
+/** Restores a saved client over the current state, filling any fields added since it was saved. */
+export function applySnapshot(state: CalculatorState, s: ClientSnapshot): CalculatorState {
+  return {
+    ...state,
+    clientInputs: { ...defaultClientInputs, ...s.clientInputs },
+    scenarios: {
+      conservative: { ...defaultScenarios.conservative, ...s.scenarios?.conservative },
+      base: { ...defaultScenarios.base, ...s.scenarios?.base },
+      optimistic: { ...defaultScenarios.optimistic, ...s.scenarios?.optimistic },
+    },
+    absenteeismInputs: { ...defaultAbsenteeismInputs, ...s.absenteeismInputs },
+    mapState: { ...defaultMapState, ...s.mapState, openQuarter: null },
+  };
+}
+
+/** The parts of calculator state that are saved with a client. */
+export function toSnapshot(state: CalculatorState): ClientSnapshot {
+  return {
+    version: 1,
+    clientInputs: state.clientInputs,
+    scenarios: state.scenarios,
+    absenteeismInputs: state.absenteeismInputs,
+    // Which quarter is expanded is UI state, not client data.
+    mapState: { ...state.mapState, openQuarter: null },
+  };
 }
 
 // ============================================================
@@ -238,6 +283,8 @@ interface CalculatorContextValue {
   setActiveTab: (tab: string) => void;
   mapDispatch: (action: MapAction) => void;
   resetDefaults: () => void;
+  loadSnapshot: (snapshot: ClientSnapshot) => void;
+  newClient: () => void;
 }
 
 const CalculatorContext = createContext<CalculatorContextValue | null>(null);
@@ -289,12 +336,20 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
     []
   );
 
+  const loadSnapshot = useCallback(
+    (snapshot: ClientSnapshot) => dispatch({ type: 'LOAD_SNAPSHOT', payload: snapshot }),
+    []
+  );
+
+  const newClient = useCallback(() => dispatch({ type: 'NEW_CLIENT' }), []);
+
   const value = useMemo(
     () => ({
       state, derived, updateClientInputs, updateScenario,
       updateAbsenteeismInputs, setActiveTab, mapDispatch, resetDefaults,
+      loadSnapshot, newClient,
     }),
-    [state, derived, updateClientInputs, updateScenario, updateAbsenteeismInputs, setActiveTab, mapDispatch, resetDefaults]
+    [state, derived, updateClientInputs, updateScenario, updateAbsenteeismInputs, setActiveTab, mapDispatch, resetDefaults, loadSnapshot, newClient]
   );
 
   return (

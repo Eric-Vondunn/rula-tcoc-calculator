@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { RotateCcw } from 'lucide-react';
 import { PopulationBasisToggle } from '@/components/shared/population-basis-toggle';
+import { ClientMenu, ClientStatus } from '@/components/clients/client-menu';
 
 export function Header() {
   const { state, updateClientInputs, resetDefaults } = useCalculator();
@@ -39,10 +40,14 @@ export function Header() {
                 className="h-8 w-40 text-sm"
               />
             </div>
+            <ClientMenu />
             <Button variant="ghost" size="sm" onClick={resetDefaults} title="Reset to defaults">
               <RotateCcw className="h-4 w-4" />
             </Button>
           </div>
+        </div>
+        <div className="-mt-2 pb-2 empty:hidden">
+          <ClientStatus />
         </div>
       </div>
     </header>
