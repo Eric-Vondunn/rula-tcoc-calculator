@@ -25,9 +25,9 @@ function fmtUpdated(iso: string): string {
 
 /** Header controls for signing in, opening, and saving clients. */
 export function ClientMenu() {
-  const { enabled, userEmail, current, hasUnsavedChanges, authError } = useClients();
+  const { enabled, userEmail, current, hasUnsavedChanges, authError, signOut } = useClients();
   // Re-open the sign-in dialog if an emailed link just failed, so the reason is visible.
-  const [dialog, setDialog] = useState<'signin' | 'list' | 'save' | null>(() => (authError ? 'signin' : null));
+  const [dialog, setDialog] = useState<'signin' | 'list' | 'save' | 'signout' | null>(() => (authError ? 'signin' : null));
 
   if (!enabled || userEmail === undefined) return null;
 
@@ -60,7 +60,26 @@ export function ClientMenu() {
         open={dialog === 'list'}
         onOpenChange={(o) => setDialog(o ? 'list' : null)}
       />
+      <Button
+        variant="ghost"
+        size="sm"
+        title={`Signed in as ${userEmail}`}
+        onClick={() => (hasUnsavedChanges ? setDialog('signout') : signOut())}
+      >
+        <LogOut className="h-3.5 w-3.5 mr-1.5" /> Log out
+      </Button>
       <SaveClientDialog open={dialog === 'save'} onOpenChange={(o) => setDialog(o ? 'save' : null)} />
+      <Dialog open={dialog === 'signout'} onOpenChange={(o) => setDialog(o ? 'signout' : null)}>
+        <DialogContent
+          title="Log out with unsaved changes?"
+          description={`Your changes to ${current?.details.name ?? 'this client'} haven't been saved. After logging out you won't be able to save them.`}
+        >
+          <div className="flex flex-wrap justify-end gap-2">
+            <Button variant="outline" onClick={() => setDialog('save')}>Save first</Button>
+            <Button variant="destructive" onClick={() => { setDialog(null); signOut(); }}>Log out anyway</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
@@ -378,7 +397,7 @@ function ClientList({ close }: { close: () => void }) {
         <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
           <span>Signed in as {userEmail}</span>
           <button type="button" onClick={() => { signOut(); close(); }} className="inline-flex items-center gap-1 text-rula-sp3 hover:underline">
-            <LogOut className="h-3 w-3" /> Sign out
+            <LogOut className="h-3 w-3" /> Log out
           </button>
         </div>
     </>
