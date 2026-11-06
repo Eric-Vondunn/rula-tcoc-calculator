@@ -25,6 +25,9 @@ interface ClientsContextValue {
   signIn: (email: string) => Promise<void>;
   /** Signs in with the 6-digit code from the sign-in email. */
   verifyCode: (email: string, code: string) => Promise<void>;
+  /** Signs in with an email and password (accounts are created by an admin in Supabase). */
+  signInWithPassword: (email: string, password: string) => Promise<void>;
+  changePassword: (newPassword: string) => Promise<void>;
   signOut: () => Promise<void>;
   /** Error from a failed sign-in link, shown in the sign-in dialog. */
   authError: string | null;
@@ -76,6 +79,29 @@ export function ClientsProvider({ children }: { children: React.ReactNode }) {
       if (error.status === 429 || /rate limit/i.test(error.message)) {
         throw new Error('Too many sign-in emails were sent recently. Wait a few minutes, or use the code from an email you already received.');
       }
+      throw error;
+    }
+  }, []);
+
+  const signInWithPassword = useCallback(async (email: string, password: string) => {
+    const sb = getSupabase();
+    if (!sb) throw new Error('Saved clients are not configured.');
+    if (!isAllowedEmail(email)) throw new Error(`Use your @${ALLOWED_EMAIL_DOMAIN} email address.`);
+    const { error } = await sb.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
+    if (error) {
+      if (error.status === 429) throw new Error('Too many sign-in attempts. Wait a few minutes and try again.');
+      throw new Error('Email or password is incorrect. If you don’t have an account yet, ask your admin to create one.');
+    }
+    setAuthError(null);
+  }, []);
+
+  const changePassword = useCallback(async (newPassword: string) => {
+    const sb = getSupabase();
+    if (!sb) throw new Error('Saved clients are not configured.');
+    const { error } = await sb.auth.updateUser({ password: newPassword });
+    if (error) {
+      if (/different from the old/i.test(error.message)) throw new Error('Choose a password different from your current one.');
+      if (/weak|at least|characters/i.test(error.message)) throw new Error(error.message);
       throw error;
     }
   }, []);
@@ -176,12 +202,13 @@ export function ClientsProvider({ children }: { children: React.ReactNode }) {
   }, [newClient]);
 
   const value = useMemo<ClientsContextValue>(() => ({
-    enabled, userEmail, signIn, verifyCode, signOut, authError, clearAuthError,
+    enabled, userEmail, signIn, verifyCode, signInWithPassword, changePassword, signOut, authError, clearAuthError,
     clients, loadingList, refreshClients,
     current, hasUnsavedChanges,
     openClient, saveClient, removeClient, startNewClient,
   }), [
-    enabled, userEmail, signIn, verifyCode, signOut, authError, clearAuthError, clients, loadingList, refreshClients,
+    enabled, userEmail, signIn, verifyCode, signInWithPassword, changePassword, signOut, authError, clearAuthError,
+    clients, loadingList, refreshClients,
     current, hasUnsavedChanges, openClient, saveClient, removeClient, startNewClient,
   ]);
 

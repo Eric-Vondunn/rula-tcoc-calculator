@@ -27,7 +27,7 @@ function fmtUpdated(iso: string): string {
 export function ClientMenu() {
   const { enabled, userEmail, current, hasUnsavedChanges, authError, signOut } = useClients();
   // Re-open the sign-in dialog if an emailed link just failed, so the reason is visible.
-  const [dialog, setDialog] = useState<'signin' | 'list' | 'save' | 'signout' | null>(() => (authError ? 'signin' : null));
+  const [dialog, setDialog] = useState<'signin' | 'list' | 'save' | 'signout' | 'password' | null>(() => (authError ? 'signin' : null));
 
   if (!enabled || userEmail === undefined) return null;
 
@@ -59,12 +59,22 @@ export function ClientMenu() {
       <ClientListDialog
         open={dialog === 'list'}
         onOpenChange={(o) => setDialog(o ? 'list' : null)}
+        openChangePassword={() => setDialog('password')}
       />
+      <Dialog open={dialog === 'password'} onOpenChange={(o) => setDialog(o ? 'password' : null)}>
+        <DialogContent title="Change password" description={`For ${userEmail}.`}>
+          <ChangePasswordForm close={() => setDialog(null)} />
+        </DialogContent>
+      </Dialog>
       <Button
         variant="ghost"
         size="sm"
         title={`Signed in as ${userEmail}`}
-        onClick={() => (hasUnsavedChanges ? setDialog('signout') : signOut())}
+        onClick={() => {
+          if (hasUnsavedChanges) { setDialog('signout'); return; }
+          setDialog(null); // don't re-open the sign-in dialog left over from signing in
+          signOut();
+        }}
       >
         <LogOut className="h-3.5 w-3.5 mr-1.5" /> Log out
       </Button>
@@ -111,7 +121,7 @@ function SignInDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o:
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         title="Sign in to save clients"
-        description={`Saved clients are shared with your team. Sign in with your @${ALLOWED_EMAIL_DOMAIN} email and we'll email you a 6-digit code.`}
+        description={`Saved clients are shared with your team. Sign in with your @${ALLOWED_EMAIL_DOMAIN} email.`}
       >
         <SignInForm />
       </DialogContent>
@@ -131,11 +141,12 @@ function rememberEmail(email: string) {
 
 // Dialog contents unmount when closed, so form state resets each time it opens.
 function SignInForm() {
-  const { signIn, verifyCode, authError, clearAuthError } = useClients();
+  const { signIn, verifyCode, signInWithPassword, authError, clearAuthError } = useClients();
   const [email, setEmail] = useState(readLastEmail);
   const [code, setCode] = useState('');
-  // After a failed link, go straight to the code step if we know the email.
-  const [step, setStep] = useState<'email' | 'code'>(() => (authError && readLastEmail() ? 'code' : 'email'));
+  const [password, setPassword] = useState('');
+  // Password is the default; after a failed email link, go straight to the code step if we know the email.
+  const [step, setStep] = useState<'password' | 'email' | 'code'>(() => (authError && readLastEmail() ? 'code' : 'password'));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(authError);
 
@@ -165,6 +176,60 @@ function SignInForm() {
     }
   };
 
+  const submitPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null); clearAuthError(); setBusy(true);
+    try {
+      await signInWithPassword(email, password);
+      rememberEmail(email.trim().toLowerCase());
+      // Success: the auth listener swaps the header to Clients/Save and this dialog unmounts.
+    } catch (err) {
+      setError(errorMessage(err));
+      setBusy(false);
+    }
+  };
+
+  if (step === 'password') {
+    return (
+      <form onSubmit={submitPassword} className="space-y-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="signin-email">Work email</Label>
+          <Input
+            id="signin-email"
+            type="email"
+            autoComplete="username"
+            required
+            placeholder={`you@${ALLOWED_EMAIL_DOMAIN}`}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="signin-password">Password</Label>
+          <Input
+            id="signin-password"
+            type="password"
+            autoComplete="current-password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        {error && <p className="text-sm text-red-600">{error}</p>}
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <button type="button" className="text-xs text-rula-sp3 hover:underline" onClick={() => { setError(null); setStep('email'); }}>
+            Email me a code instead
+          </button>
+          <Button type="submit" disabled={busy}>
+            {busy && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
+            Sign in
+          </Button>
+        </div>
+        <p className="text-xs text-gray-500">No account yet, or forgot your password? Ask your admin.</p>
+      </form>
+    );
+  }
+
   if (step === 'code') {
     return (
       <form onSubmit={verify} className="space-y-4">
@@ -191,8 +256,8 @@ function SignInForm() {
         {error && <p className="text-sm text-red-600">{error}</p>}
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex gap-3 text-xs">
-            <button type="button" className="text-rula-sp3 hover:underline" onClick={() => { setError(null); setStep('email'); }}>
-              Use a different email
+            <button type="button" className="text-rula-sp3 hover:underline" onClick={() => { setError(null); setStep('password'); }}>
+              Use a password instead
             </button>
             <button type="button" className="text-rula-sp3 hover:underline disabled:opacity-50" disabled={busy} onClick={() => send()}>
               Send a new email
@@ -223,16 +288,21 @@ function SignInForm() {
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <button
-          type="button"
-          className="text-xs text-rula-sp3 hover:underline"
-          onClick={() => {
-            if (!isAllowedEmail(email)) { setError(`Enter your @${ALLOWED_EMAIL_DOMAIN} email first.`); return; }
-            setError(null); setStep('code');
-          }}
-        >
-          I already have a code
-        </button>
+        <div className="flex gap-3 text-xs">
+          <button type="button" className="text-rula-sp3 hover:underline" onClick={() => { setError(null); setStep('password'); }}>
+            Use a password instead
+          </button>
+          <button
+            type="button"
+            className="text-rula-sp3 hover:underline"
+            onClick={() => {
+              if (!isAllowedEmail(email)) { setError(`Enter your @${ALLOWED_EMAIL_DOMAIN} email first.`); return; }
+              setError(null); setStep('code');
+            }}
+          >
+            I already have a code
+          </button>
+        </div>
         <Button type="submit" disabled={busy}>
           {busy && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
           Email me a code
@@ -246,17 +316,19 @@ function SignInForm() {
 // Client list
 // ------------------------------------------------------------------
 
-function ClientListDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+function ClientListDialog({
+  open, onOpenChange, openChangePassword,
+}: { open: boolean; onOpenChange: (o: boolean) => void; openChangePassword: () => void }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent title="Saved clients" description="Shared with everyone on your team." className="max-w-2xl">
-        <ClientList close={() => onOpenChange(false)} />
+        <ClientList close={() => onOpenChange(false)} openChangePassword={openChangePassword} />
       </DialogContent>
     </Dialog>
   );
 }
 
-function ClientList({ close }: { close: () => void }) {
+function ClientList({ close, openChangePassword }: { close: () => void; openChangePassword: () => void }) {
   const {
     clients, loadingList, refreshClients, openClient, removeClient, startNewClient,
     current, hasUnsavedChanges, userEmail, signOut,
@@ -394,8 +466,11 @@ function ClientList({ close }: { close: () => void }) {
           )}
         </div>
 
-        <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
-          <span>Signed in as {userEmail}</span>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs text-gray-500">
+          <span>
+            Signed in as {userEmail} ·{' '}
+            <button type="button" onClick={openChangePassword} className="text-rula-sp3 hover:underline">Change password</button>
+          </span>
           <button type="button" onClick={() => { signOut(); close(); }} className="inline-flex items-center gap-1 text-rula-sp3 hover:underline">
             <LogOut className="h-3 w-3" /> Log out
           </button>
@@ -493,5 +568,67 @@ function SaveClientForm({ close }: { close: () => void }) {
             </Button>
           </div>
         </form>
+  );
+}
+
+// ------------------------------------------------------------------
+// Change password
+// ------------------------------------------------------------------
+
+const MIN_PASSWORD_LENGTH = 8;
+
+function ChangePasswordForm({ close }: { close: () => void }) {
+  const { changePassword } = useClients();
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [done, setDone] = useState(false);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    if (password.length < MIN_PASSWORD_LENGTH) { setError(`Use at least ${MIN_PASSWORD_LENGTH} characters.`); return; }
+    if (password !== confirm) { setError('The two passwords don’t match.'); return; }
+    setBusy(true);
+    try {
+      await changePassword(password);
+      setDone(true);
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (done) {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-lg bg-rula-sp1 p-4 text-sm text-rula-purple">Your password has been changed.</div>
+        <div className="flex justify-end"><Button onClick={close}>Done</Button></div>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={submit} className="space-y-4">
+      <div className="space-y-1.5">
+        <Label htmlFor="new-password">New password</Label>
+        <Input id="new-password" type="password" autoComplete="new-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+        <p className="text-xs text-gray-500">At least {MIN_PASSWORD_LENGTH} characters.</p>
+      </div>
+      <div className="space-y-1.5">
+        <Label htmlFor="confirm-password">Confirm new password</Label>
+        <Input id="confirm-password" type="password" autoComplete="new-password" required value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+      </div>
+      {error && <p className="text-sm text-red-600">{error}</p>}
+      <div className="flex justify-end gap-2">
+        <Button type="button" variant="outline" onClick={close}>Cancel</Button>
+        <Button type="submit" disabled={busy}>
+          {busy && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
+          Change password
+        </Button>
+      </div>
+    </form>
   );
 }
