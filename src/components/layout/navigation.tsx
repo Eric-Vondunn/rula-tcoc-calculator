@@ -17,8 +17,8 @@ const navItems = [
   { id: 'comorbidity', label: 'Comorbidity Analysis', icon: Activity },
   { id: 'financial', label: 'Financial Impact', icon: DollarSign },
   { id: 'absenteeism', label: 'Absenteeism & Productivity', icon: Clock },
-  { id: 'summary', label: 'Executive Summary', icon: FileText },
   { id: 'action-plan', label: 'Rula Engagement Plan', icon: Handshake },
+  { id: 'summary', label: 'Executive Summary', icon: FileText },
   { id: 'methodology', label: 'Research & Methodology', icon: BookOpen },
 ];
 
