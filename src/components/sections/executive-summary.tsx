@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Disclaimer } from '@/components/shared/disclaimer';
-import { formatNumber, formatCurrency, formatPercent } from '@/lib/utils';
+import { formatNumber, formatCurrency, formatCurrencyExact, formatPercent } from '@/lib/utils';
 import { OVERLAP_DISCLAIMER, FINANCIAL_DISCLAIMER } from '@/data/defaults';
 import { conditionBenchmarks } from '@/data/benchmarks';
 import { computeModel, computePlan, rateOf, ppl, usd, pct, longDate, parseYmd, schedule } from '@/components/sections/mutual-action-plan/calculations';
@@ -82,7 +82,7 @@ export function ExecutiveSummary() {
 
     narrative += ' Improving access to appropriate behavioral health treatment may offer opportunities to reduce medical utilization and associated spending.';
 
-    narrative += ` Beyond direct medical costs, untreated behavioral health conditions drive significant productivity losses through absenteeism. Research indicates that individuals with untreated mental health conditions miss approximately ${absenteeismResult.missedDaysChronicUntreated} workdays per year when combined with a chronic condition — compared to ${absenteeismResult.missedDaysNoMh} days for those without mental health conditions. At an average salary of ${formatCurrency(absenteeismInputs.averageSalary)}, this represents a meaningful per-employee cost to the organization.`;
+    narrative += ` Beyond direct medical costs, untreated behavioral health conditions drive significant productivity losses through absenteeism. Research indicates that individuals with untreated mental health conditions miss approximately ${absenteeismResult.missedDaysChronicUntreated} workdays per year when combined with a chronic condition — compared to ${absenteeismResult.missedDaysNoMh} days for those without mental health conditions. At an average salary of ${formatCurrencyExact(absenteeismInputs.averageSalary)}, this represents a meaningful per-employee cost to the organization.`;
 
     narrative += ' Financial estimates depend on the specific population mix, treatment engagement rates, intervention costs, and realized clinical outcomes.';
 
@@ -493,7 +493,7 @@ export function ExecutiveSummary() {
           </div>
           <p className="mt-4 text-xs text-gray-400 italic">
             Medical savings: ${(treatedVsUntreatedResults[0]?.untreatedMedicalClaims - treatedVsUntreatedResults[0]?.treatedMedicalClaims).toLocaleString()}/person.
-            Absenteeism based on avg salary of {formatCurrency(absenteeismInputs.averageSalary)} and {absenteeismInputs.workdaysPerYear} workdays/year.
+            Absenteeism based on avg salary of {formatCurrencyExact(absenteeismInputs.averageSalary)} and {absenteeismInputs.workdaysPerYear} workdays/year.
             Rula treatment: $130/session × 10 sessions = $1,300/person. {OVERLAP_DISCLAIMER}
           </p>
         </CardContent>
@@ -784,7 +784,7 @@ export function ExecutiveSummary() {
               {clientInputs.recoverableCostPercentage !== null && (
                 <li>Recoverable cost percentage: {(clientInputs.recoverableCostPercentage * 100).toFixed(0)}%</li>
               )}
-              <li>Average salary: {formatCurrency(absenteeismInputs.averageSalary)} / {absenteeismInputs.workdaysPerYear} workdays/year</li>
+              <li>Average salary: {formatCurrencyExact(absenteeismInputs.averageSalary)} / {absenteeismInputs.workdaysPerYear} workdays/year</li>
               <li>
                 Rula treatment cost: $130/session × 10 avg sessions = $1,300/person{' '}
                 <Badge variant="warning" className="text-xs">Pending Verification</Badge>

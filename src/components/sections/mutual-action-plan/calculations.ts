@@ -1,3 +1,4 @@
+import { formatCurrency } from '@/lib/utils';
 import {
   BM, A, CARE, E_CONST, COMMITTED, TAC, ADDONS, CH, MOM, MONTHS, MS,
   MN, MF, WD,
@@ -299,7 +300,7 @@ export function computeClashes(dates: [string, string, string, string]): ClashIn
 }
 
 /* ---- formatting helpers ---- */
-export function usd(x: number): string { return '$' + Math.ceil(x).toLocaleString('en-US'); }
+export function usd(x: number): string { return formatCurrency(x); }
 export function pct(x: number, d = 0): string { return (x * 100).toFixed(d) + '%'; }
 export function ppl(x: number): string { return (x <= 0 ? 0 : Math.ceil(x)).toLocaleString('en-US'); }
 export function n0(x: number): string { return Math.ceil(x).toLocaleString('en-US'); }

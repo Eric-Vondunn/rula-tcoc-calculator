@@ -4,7 +4,7 @@ import { useCalculator } from '@/hooks/use-calculator';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { NumberInput } from '@/components/shared/number-input';
 import { Disclaimer } from '@/components/shared/disclaimer';
-import { formatNumber, formatCurrency } from '@/lib/utils';
+import { formatNumber, formatCurrency, formatCurrencyExact } from '@/lib/utils';
 import { InfoTip } from '@/components/shared/info-tip';
 import { OVERLAP_DISCLAIMER, PRODUCTIVITY_DISCLAIMER } from '@/data/defaults';
 import { absenteeismBenchmarks } from '@/data/defaults';
@@ -211,7 +211,7 @@ export function Absenteeism() {
             <div className="rounded-lg bg-rula-sp1 border border-rula-sp2 px-4 py-2">
               <span className="text-rula-purple font-medium">Rula Cost: </span>
               <span className="font-bold text-rula-purple">
-                {formatCurrency(absenteeismBenchmarks.rulaCostPerSession)} x {absenteeismBenchmarks.rulaAvgSessions} sessions = {formatCurrency(rulaCostPerPerson)}/person
+                {formatCurrencyExact(absenteeismBenchmarks.rulaCostPerSession)} x {absenteeismBenchmarks.rulaAvgSessions} sessions = {formatCurrency(rulaCostPerPerson)}/person
               </span>
             </div>
           </div>
