@@ -19,6 +19,9 @@ import { conditionBenchmarks, costBenchmarks, getCostBenchmark } from '@/data/be
 import { calculateAllConditions } from '@/lib/engine/population';
 import { calculateFinancialBurden, calculateScenario } from '@/lib/engine/financial';
 import { calculateAbsenteeism, calculateTreatedVsUntreated } from '@/lib/engine/absenteeism';
+import {
+  getAnalysisPopulation, getEffectiveAdultPercentage, getPopulationLabels, type PopulationLabels,
+} from '@/lib/population-basis';
 
 // ============================================================
 // State & Actions
@@ -156,11 +159,19 @@ interface DerivedData {
   absenteeismResult: AbsenteeismResult;
   treatedVsUntreatedResults: TreatedVsUntreatedCost[];
   adultMembers: number;
+  /** Employees, or employees × 2.2 when the members basis is selected. */
+  analysisPopulation: number;
+  /** Adult share actually applied (100% for employees). */
+  effectiveAdultPercentage: number;
+  populationLabels: PopulationLabels;
 }
 
 function computeDerived(state: CalculatorState): DerivedData {
   const { clientInputs, scenarios, absenteeismInputs } = state;
-  const adultMembers = clientInputs.totalCoveredMembers * clientInputs.adultPercentage;
+  const analysisPopulation = getAnalysisPopulation(clientInputs);
+  const effectiveAdultPercentage = getEffectiveAdultPercentage(clientInputs);
+  const populationLabels = getPopulationLabels(clientInputs.populationBasis);
+  const adultMembers = analysisPopulation * effectiveAdultPercentage;
 
   const populationResults = calculateAllConditions(conditionBenchmarks, clientInputs);
 
@@ -196,6 +207,7 @@ function computeDerived(state: CalculatorState): DerivedData {
   return {
     populationResults, financialResults, scenarioResults,
     absenteeismResult, treatedVsUntreatedResults, adultMembers,
+    analysisPopulation, effectiveAdultPercentage, populationLabels,
   };
 }
 

@@ -2,11 +2,12 @@ import { z } from 'zod/v4';
 
 export const clientInputsSchema = z.object({
   clientName: z.string().max(200).default(''),
-  totalCoveredMembers: z
+  employeeCount: z
     .number()
     .int()
     .min(1, 'Must be at least 1')
-    .max(10_000_000, 'Maximum 10,000,000 members'),
+    .max(5_000_000, 'Maximum 5,000,000 employees'),
+  populationBasis: z.enum(['employees', 'members']),
   analysisYear: z
     .number()
     .int()

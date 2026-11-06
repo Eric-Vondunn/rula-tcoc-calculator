@@ -4,7 +4,8 @@ import type { ConditionBenchmark, ClientInputs } from '@/types';
 
 const baseInputs: ClientInputs = {
   clientName: 'Test Employer',
-  totalCoveredMembers: 25000,
+  employeeCount: 25000 / 2.2,
+  populationBasis: 'members',
   analysisYear: 2024,
   adultPercentage: 0.78,
   employerPaidShare: 0.80,

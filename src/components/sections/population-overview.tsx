@@ -6,6 +6,8 @@ import { MetricCard } from '@/components/shared/metric-card';
 import { NumberInput } from '@/components/shared/number-input';
 import { Disclaimer } from '@/components/shared/disclaimer';
 import { formatNumber } from '@/lib/utils';
+import { MEMBERS_PER_EMPLOYEE, employeesToMembers } from '@/lib/population-basis';
+import { PopulationBasisToggle } from '@/components/shared/population-basis-toggle';
 import { InfoTip } from '@/components/shared/info-tip';
 import { Users, UserCheck, Heart } from 'lucide-react';
 import {
@@ -24,7 +26,8 @@ const COLORS = ['#46219E', '#6C4CEA', '#AD99FF', '#F3D457', '#059669', '#3F4146'
 export function PopulationOverview() {
   const { state, derived, updateClientInputs } = useCalculator();
   const { clientInputs } = state;
-  const { populationResults, adultMembers } = derived;
+  const { populationResults, adultMembers, analysisPopulation, effectiveAdultPercentage, populationLabels } = derived;
+  const isMembers = clientInputs.populationBasis === 'members';
 
   const chartData = populationResults
     .filter((r) => r.estimatedWithCondition !== null)
@@ -58,6 +61,15 @@ export function PopulationOverview() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="mb-6 flex flex-wrap items-center gap-3">
+            <span className="text-sm font-medium text-gray-700">Calculate results based on:</span>
+            <PopulationBasisToggle />
+            <span className="text-xs text-gray-500">
+              {isMembers
+                ? `Total membership = employees × ${MEMBERS_PER_EMPLOYEE}`
+                : 'Employees only (excludes dependents)'}
+            </span>
+          </div>
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Client / Employer Name
@@ -72,13 +84,13 @@ export function PopulationOverview() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <NumberInput
-              label="Total Covered Members"
-              value={clientInputs.totalCoveredMembers}
-              onChange={(v) => updateClientInputs({ totalCoveredMembers: v ?? 1 })}
+              label="Number of Employees"
+              value={clientInputs.employeeCount}
+              onChange={(v) => updateClientInputs({ employeeCount: v ?? 1 })}
               min={1}
-              max={10000000}
-              step={1000}
-              helpText="Employees and covered dependents"
+              max={5000000}
+              step={100}
+              helpText={`≈ ${formatNumber(employeesToMembers(clientInputs.employeeCount))} total members (× ${MEMBERS_PER_EMPLOYEE})`}
             />
             <NumberInput
               label="Adult Members (%)"
@@ -89,7 +101,8 @@ export function PopulationOverview() {
               step={0.01}
               formatAsPercent
               suffix="%"
-              helpText="Percentage of members age 18+"
+              disabled={!isMembers}
+              helpText={isMembers ? 'Percentage of members age 18+' : 'Not applied — all employees are adults'}
               sourceLabel="Industry benchmark: ~78%"
             />
             <NumberInput
@@ -107,17 +120,25 @@ export function PopulationOverview() {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <MetricCard
-          label="Total Covered Members"
-          value={formatNumber(clientInputs.totalCoveredMembers)}
-          tooltip="User input: total employees and covered dependents."
+          label={populationLabels.title}
+          value={formatNumber(analysisPopulation)}
+          tooltip={
+            isMembers
+              ? `Employees × ${MEMBERS_PER_EMPLOYEE} (employees plus covered dependents).`
+              : 'User input: number of employees.'
+          }
           icon={Users}
           iconColor="text-rula-sp3"
         />
         <MetricCard
-          label="Estimated Adult Members"
+          label={isMembers ? 'Estimated Adult Members' : 'Adult Employees'}
           value={formatNumber(adultMembers)}
-          subtitle={`${(clientInputs.adultPercentage * 100).toFixed(0)}% of total`}
-          tooltip="Total covered members × adult percentage (default 78%, industry benchmark)."
+          subtitle={`${(effectiveAdultPercentage * 100).toFixed(0)}% of total`}
+          tooltip={
+            isMembers
+              ? 'Total covered members × adult percentage (default 78%, industry benchmark).'
+              : 'All employees are counted as adults.'
+          }
           icon={UserCheck}
           iconColor="text-rula-light"
         />
@@ -247,7 +268,7 @@ export function PopulationOverview() {
                       {r.conditionId === 'specialty_rx_glp1'
                         ? 'Client data required'
                         : r.prevalenceRate !== null
-                          ? (populationResults.find(p => p.conditionId === r.conditionId)?.eligiblePopulation === adultMembers ? 'Adult members' : 'Total members')
+                          ? (populationResults.find(p => p.conditionId === r.conditionId)?.eligiblePopulation === adultMembers ? populationLabels.adultTitle : populationLabels.totalTitle)
                           : '—'}
                     </td>
                   </tr>

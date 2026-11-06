@@ -62,7 +62,8 @@ export const currentYear = new Date().getFullYear();
 
 export const defaultClientInputs: ClientInputs = {
   clientName: '',
-  totalCoveredMembers: 25000,
+  employeeCount: 10000,
+  populationBasis: 'members',
   analysisYear: currentYear,
   adultPercentage: 0.78,
   employerPaidShare: 0.80,

@@ -4,6 +4,7 @@ import { useCalculator } from '@/hooks/use-calculator';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { RotateCcw } from 'lucide-react';
+import { PopulationBasisToggle } from '@/components/shared/population-basis-toggle';
 
 export function Header() {
   const { state, updateClientInputs, resetDefaults } = useCalculator();
@@ -22,6 +23,10 @@ export function Header() {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500 hidden lg:inline">Results by:</span>
+              <PopulationBasisToggle />
+            </div>
             <div className="flex items-center gap-2">
               <label htmlFor="client-name-header" className="text-xs text-gray-500 hidden md:inline">
                 Client:

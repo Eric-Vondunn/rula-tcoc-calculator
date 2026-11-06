@@ -18,7 +18,7 @@ export function MutualActionPlan() {
     if (!didSync.current) {
       didSync.current = true;
       const name = calcState.clientInputs.clientName || '[Employer Name]';
-      const heads = Math.round(calcState.clientInputs.totalCoveredMembers * calcState.clientInputs.adultPercentage);
+      const heads = calcState.clientInputs.employeeCount;
       if (state.employerName === '[Employer Name]') {
         dispatch({ type: 'SET_EMPLOYER_NAME', value: name });
       }

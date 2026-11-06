@@ -1,29 +1,36 @@
 import type { ConditionBenchmark, ClientInputs, ConditionPopulationResult } from '@/types';
+import { getAnalysisPopulation, getEffectiveAdultPercentage, getPopulationLabels } from '@/lib/population-basis';
 
 export function calculateConditionPopulation(
   benchmark: ConditionBenchmark,
   inputs: ClientInputs
 ): ConditionPopulationResult {
   const notes: string[] = [];
-  const { totalCoveredMembers, adultPercentage } = inputs;
+  const totalPopulation = getAnalysisPopulation(inputs);
+  const adultPercentage = getEffectiveAdultPercentage(inputs);
+  const labels = getPopulationLabels(inputs.populationBasis);
 
   // Determine eligible population based on denominator
   let eligiblePopulation: number;
   switch (benchmark.prevalenceDenominator) {
     case 'adult_members':
-      eligiblePopulation = totalCoveredMembers * adultPercentage;
-      notes.push(`Eligible population based on adult members (${(adultPercentage * 100).toFixed(0)}% of total).`);
+      eligiblePopulation = totalPopulation * adultPercentage;
+      notes.push(
+        inputs.populationBasis === 'members'
+          ? `Eligible population based on adult members (${(adultPercentage * 100).toFixed(0)}% of total).`
+          : 'Eligible population includes all employees (all adults).'
+      );
       break;
     case 'total_members':
-      eligiblePopulation = totalCoveredMembers;
-      notes.push('Eligible population includes all covered members.');
+      eligiblePopulation = totalPopulation;
+      notes.push(`Eligible population includes all ${labels.plural}.`);
       break;
     case 'specific_cohort':
-      eligiblePopulation = totalCoveredMembers;
+      eligiblePopulation = totalPopulation;
       notes.push('Requires client-specific cohort data.');
       break;
     default:
-      eligiblePopulation = totalCoveredMembers;
+      eligiblePopulation = totalPopulation;
   }
 
   // Calculate condition prevalence

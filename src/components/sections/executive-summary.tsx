@@ -19,6 +19,7 @@ export function ExecutiveSummary() {
   const { clientInputs, absenteeismInputs, mapState } = state;
   const {
     populationResults, financialResults, scenarioResults, adultMembers,
+    analysisPopulation, effectiveAdultPercentage, populationLabels,
     absenteeismResult, treatedVsUntreatedResults,
   } = derived;
 
@@ -76,9 +77,9 @@ export function ExecutiveSummary() {
 
   const generateNarrative = (): string => {
     const condCount = availableConditions.length;
-    const totalMembers = formatNumber(clientInputs.totalCoveredMembers);
+    const totalMembers = formatNumber(analysisPopulation);
 
-    let narrative = `Based on national population health benchmarks, an employer with ${totalMembers} covered members may have a meaningful population experiencing co-occurring chronic physical and behavioral health conditions across ${condCount} evaluated condition categories.`;
+    let narrative = `Based on national population health benchmarks, an employer with ${totalMembers} ${populationLabels.plural} may have a meaningful population experiencing co-occurring chronic physical and behavioral health conditions across ${condCount} evaluated condition categories.`;
 
     narrative += ' Improving access to appropriate behavioral health treatment may offer opportunities to reduce medical utilization and associated spending.';
 
@@ -109,9 +110,9 @@ export function ExecutiveSummary() {
             </p>
             <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-gray-500">
               <span>
-                Covered Members:{' '}
+                {clientInputs.populationBasis === 'members' ? 'Covered Members' : 'Employees'}:{' '}
                 <span className="font-semibold text-gray-900">
-                  {formatNumber(clientInputs.totalCoveredMembers)}
+                  {formatNumber(analysisPopulation)}
                 </span>
               </span>
               <span>
@@ -161,8 +162,8 @@ export function ExecutiveSummary() {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Total Covered Members<InfoTip>User input: total employees and covered dependents.</InfoTip></p>
-              <p className="text-2xl font-bold text-gray-900">{formatNumber(clientInputs.totalCoveredMembers)}</p>
+              <p className="text-sm text-gray-500">{populationLabels.title}<InfoTip>{clientInputs.populationBasis === 'members' ? 'Employees × 2.2 (employees plus covered dependents).' : 'User input: number of employees.'}</InfoTip></p>
+              <p className="text-2xl font-bold text-gray-900">{formatNumber(analysisPopulation)}</p>
             </div>
             <div className="space-y-1">
               <p className="text-sm text-gray-500">Combined Chronic Conditions<InfoTip>Sum of (eligible population × prevalence rate) per condition. Includes overlap.</InfoTip></p>
@@ -730,7 +731,8 @@ export function ExecutiveSummary() {
       <div className="no-print">
         <FollowUpEmail
           clientName={clientName}
-          totalCoveredMembers={clientInputs.totalCoveredMembers}
+          analysisPopulation={analysisPopulation}
+          populationLabel={populationLabels.plural}
           analysisYear={clientInputs.analysisYear}
           adultMembers={adultMembers}
           totalWithCondition={totalWithCondition}
@@ -774,7 +776,14 @@ export function ExecutiveSummary() {
           <div>
             <h4 className="font-semibold text-gray-900 text-sm mb-2">Assumptions</h4>
             <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-              <li>Adult population estimated at {(clientInputs.adultPercentage * 100).toFixed(0)}% of covered members</li>
+              {clientInputs.populationBasis === 'members' ? (
+                <>
+                  <li>Total membership estimated at {formatNumber(clientInputs.employeeCount)} employees × 2.2</li>
+                  <li>Adult population estimated at {(effectiveAdultPercentage * 100).toFixed(0)}% of covered members</li>
+                </>
+              ) : (
+                <li>Results calculated on employees only; all employees treated as adults</li>
+              )}
               <li>Employer-paid share of claims: {(clientInputs.employerPaidShare * 100).toFixed(0)}%</li>
               <li>
                 Incremental cost benchmark: $10,000/year per untreated individual{' '}

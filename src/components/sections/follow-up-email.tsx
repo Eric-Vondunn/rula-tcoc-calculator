@@ -17,7 +17,10 @@ interface QuarterDate {
 
 export interface FollowUpEmailProps {
   clientName: string;
-  totalCoveredMembers: number;
+  /** Employees, or total covered members, depending on the selected basis. */
+  analysisPopulation: number;
+  /** "employees" | "covered members" */
+  populationLabel: string;
   analysisYear: number;
   adultMembers: number;
   totalWithCondition: number;
@@ -65,7 +68,7 @@ function generateConsultantEmail(p: FollowUpEmailProps): { subject: string; body
   // Population overview
   lines.push('POPULATION OVERVIEW');
   lines.push('---');
-  lines.push(`Across your ${formatNumber(p.totalCoveredMembers)} covered members, our analysis identified an estimated ${formatNumber(p.totalWithBhComorbidity)} individuals with co-occurring chronic physical and behavioral health conditions, of whom approximately ${formatNumber(p.totalUntreated)} may not be receiving adequate behavioral health treatment.`);
+  lines.push(`Across your ${formatNumber(p.analysisPopulation)} ${p.populationLabel}, our analysis identified an estimated ${formatNumber(p.totalWithBhComorbidity)} individuals with co-occurring chronic physical and behavioral health conditions, of whom approximately ${formatNumber(p.totalUntreated)} may not be receiving adequate behavioral health treatment.`);
   lines.push('');
   lines.push(`This untreated population is associated with ${formatCurrency(p.totalModeledSpending)} in combined modeled annual spending.`);
   lines.push('');
@@ -152,7 +155,7 @@ function generateEmployerEmail(p: FollowUpEmailProps): { subject: string; body: 
   // Key findings
   lines.push('KEY FINDINGS');
   lines.push('---');
-  lines.push(`Across our ${formatNumber(p.totalCoveredMembers)} covered members (${p.analysisYear} analysis):`);
+  lines.push(`Across our ${formatNumber(p.analysisPopulation)} ${p.populationLabel} (${p.analysisYear} analysis):`);
   lines.push('');
   lines.push(`  • Estimated employees with co-occurring BH conditions: ${formatNumber(p.totalWithBhComorbidity)}`);
   lines.push(`  • Estimated currently untreated: ${formatNumber(p.totalUntreated)}`);

@@ -69,9 +69,14 @@ export interface CostBenchmark {
 // User Input Types
 // ============================================================
 
+/** Whether results are calculated on employees only or total membership (employees × 2.2). */
+export type PopulationBasis = 'employees' | 'members';
+
 export interface ClientInputs {
   clientName: string;
-  totalCoveredMembers: number;
+  /** Number of employees. Total membership is derived as employees × 2.2. */
+  employeeCount: number;
+  populationBasis: PopulationBasis;
   analysisYear: number;
   adultPercentage: number;
   employerPaidShare: number;
