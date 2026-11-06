@@ -5,7 +5,7 @@ import { FolderOpen, Save, LogIn, LogOut, Plus, Search, Trash2, Loader2 } from '
 import { useCalculator } from '@/hooks/use-calculator';
 import { useClients } from '@/hooks/use-clients';
 import { ClientConflictError, type ClientDetails } from '@/lib/clients/repository';
-import { ALLOWED_EMAIL_DOMAIN } from '@/lib/clients/supabase';
+import { ALLOWED_EMAIL_DOMAIN, isAllowedEmail } from '@/lib/clients/supabase';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,8 +25,9 @@ function fmtUpdated(iso: string): string {
 
 /** Header controls for signing in, opening, and saving clients. */
 export function ClientMenu() {
-  const { enabled, userEmail, current, hasUnsavedChanges } = useClients();
-  const [dialog, setDialog] = useState<'signin' | 'list' | 'save' | null>(null);
+  const { enabled, userEmail, current, hasUnsavedChanges, authError } = useClients();
+  // Re-open the sign-in dialog if an emailed link just failed, so the reason is visible.
+  const [dialog, setDialog] = useState<'signin' | 'list' | 'save' | null>(() => (authError ? 'signin' : null));
 
   if (!enabled || userEmail === undefined) return null;
 
@@ -91,7 +92,7 @@ function SignInDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o:
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         title="Sign in to save clients"
-        description={`Saved clients are shared with your team. Sign in with your @${ALLOWED_EMAIL_DOMAIN} email and we'll send you a link.`}
+        description={`Saved clients are shared with your team. Sign in with your @${ALLOWED_EMAIL_DOMAIN} email and we'll email you a link and a 6-digit code.`}
       >
         <SignInForm />
       </DialogContent>
@@ -99,56 +100,126 @@ function SignInDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o:
   );
 }
 
+const LAST_EMAIL_KEY = 'tcoc:lastSignInEmail';
+
+function readLastEmail(): string {
+  try { return localStorage.getItem(LAST_EMAIL_KEY) ?? ''; } catch { return ''; }
+}
+
+function rememberEmail(email: string) {
+  try { localStorage.setItem(LAST_EMAIL_KEY, email); } catch { /* storage unavailable */ }
+}
+
 // Dialog contents unmount when closed, so form state resets each time it opens.
 function SignInForm() {
-  const { signIn } = useClients();
-  const [email, setEmail] = useState('');
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent'>('idle');
-  const [error, setError] = useState<string | null>(null);
+  const { signIn, verifyCode, authError, clearAuthError } = useClients();
+  const [email, setEmail] = useState(readLastEmail);
+  const [code, setCode] = useState('');
+  // After a failed link, go straight to the code step if we know the email.
+  const [step, setStep] = useState<'email' | 'code'>(() => (authError && readLastEmail() ? 'code' : 'email'));
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(authError);
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setStatus('sending');
+  const send = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    setError(null); clearAuthError(); setBusy(true);
     try {
       await signIn(email);
-      setStatus('sent');
+      rememberEmail(email.trim().toLowerCase());
+      setStep('code');
     } catch (err) {
       setError(errorMessage(err));
-      setStatus('idle');
+    } finally {
+      setBusy(false);
     }
   };
 
-  return (
-    <>
-        {status === 'sent' ? (
+  const verify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null); setBusy(true);
+    try {
+      await verifyCode(email, code);
+      // Success: the auth listener swaps the header to Clients/Save and this dialog unmounts.
+    } catch (err) {
+      setError(errorMessage(err));
+      setBusy(false);
+    }
+  };
+
+  if (step === 'code') {
+    return (
+      <form onSubmit={verify} className="space-y-4">
+        {!error && (
           <div className="rounded-lg bg-rula-sp1 p-4 text-sm text-rula-purple">
-            Check <strong>{email}</strong> for a sign-in link. Open it in this browser to finish signing in.
+            We sent an email to <strong>{email}</strong>. Click the link in it, or enter the 6-digit code below.
+            The link works in any browser.
           </div>
-        ) : (
-          <form onSubmit={submit} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="signin-email">Work email</Label>
-              <Input
-                id="signin-email"
-                type="email"
-                autoComplete="email"
-                required
-                placeholder={`you@${ALLOWED_EMAIL_DOMAIN}`}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            {error && <p className="text-sm text-red-600">{error}</p>}
-            <div className="flex justify-end">
-              <Button type="submit" disabled={status === 'sending'}>
-                {status === 'sending' && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
-                Send sign-in link
-              </Button>
-            </div>
-          </form>
         )}
-    </>
+        <div className="space-y-1.5">
+          <Label htmlFor="signin-code">6-digit code</Label>
+          <Input
+            id="signin-code"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            required
+            maxLength={10}
+            placeholder="123456"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            className="tracking-widest"
+          />
+        </div>
+        {error && <p className="text-sm text-red-600">{error}</p>}
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex gap-3 text-xs">
+            <button type="button" className="text-rula-sp3 hover:underline" onClick={() => { setError(null); setStep('email'); }}>
+              Use a different email
+            </button>
+            <button type="button" className="text-rula-sp3 hover:underline disabled:opacity-50" disabled={busy} onClick={() => send()}>
+              Send a new email
+            </button>
+          </div>
+          <Button type="submit" disabled={busy}>
+            {busy && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
+            Sign in
+          </Button>
+        </div>
+      </form>
+    );
+  }
+
+  return (
+    <form onSubmit={send} className="space-y-4">
+      <div className="space-y-1.5">
+        <Label htmlFor="signin-email">Work email</Label>
+        <Input
+          id="signin-email"
+          type="email"
+          autoComplete="email"
+          required
+          placeholder={`you@${ALLOWED_EMAIL_DOMAIN}`}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </div>
+      {error && <p className="text-sm text-red-600">{error}</p>}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <button
+          type="button"
+          className="text-xs text-rula-sp3 hover:underline"
+          onClick={() => {
+            if (!isAllowedEmail(email)) { setError(`Enter your @${ALLOWED_EMAIL_DOMAIN} email first.`); return; }
+            setError(null); setStep('code');
+          }}
+        >
+          I already have a code
+        </button>
+        <Button type="submit" disabled={busy}>
+          {busy && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
+          Send sign-in email
+        </Button>
+      </div>
+    </form>
   );
 }
 

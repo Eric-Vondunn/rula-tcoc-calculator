@@ -2,7 +2,10 @@
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useCalculator, toSnapshot, applySnapshot } from '@/hooks/use-calculator';
-import { getSupabase, isAllowedEmail, isSupabaseConfigured, ALLOWED_EMAIL_DOMAIN } from '@/lib/clients/supabase';
+import {
+  getSupabase, isAllowedEmail, isSupabaseConfigured, ALLOWED_EMAIL_DOMAIN,
+  readAuthErrorFromUrl, clearAuthParamsFromUrl,
+} from '@/lib/clients/supabase';
 import {
   listClients, getClient, createClient, updateClient, deleteClient,
   type ClientDetails, type SavedClientSummary,
@@ -20,7 +23,12 @@ interface ClientsContextValue {
   /** Signed-in email, or null. `undefined` while the session is loading. */
   userEmail: string | null | undefined;
   signIn: (email: string) => Promise<void>;
+  /** Signs in with the 6-digit code from the sign-in email. */
+  verifyCode: (email: string, code: string) => Promise<void>;
   signOut: () => Promise<void>;
+  /** Error from a failed sign-in link, shown in the sign-in dialog. */
+  authError: string | null;
+  clearAuthError: () => void;
 
   clients: SavedClientSummary[];
   loadingList: boolean;
@@ -49,6 +57,9 @@ export function ClientsProvider({ children }: { children: React.ReactNode }) {
   const [loadingList, setLoadingList] = useState(false);
   const [current, setCurrent] = useState<CurrentClient | null>(null);
   const [savedJson, setSavedJson] = useState<string | null>(null);
+  // Read once on load: a failed email link lands back here with an error in the URL.
+  const [authError, setAuthError] = useState<string | null>(() => (enabled ? readAuthErrorFromUrl() : null));
+  const clearAuthError = useCallback(() => setAuthError(null), []);
 
   const snapshotJson = useMemo(() => JSON.stringify(toSnapshot(state)), [state]);
   const hasUnsavedChanges = current !== null && savedJson !== snapshotJson;
@@ -59,9 +70,26 @@ export function ClientsProvider({ children }: { children: React.ReactNode }) {
     if (!isAllowedEmail(email)) throw new Error(`Use your @${ALLOWED_EMAIL_DOMAIN} email address.`);
     const { error } = await sb.auth.signInWithOtp({
       email: email.trim().toLowerCase(),
-      options: { emailRedirectTo: window.location.origin },
+      options: { emailRedirectTo: `${window.location.origin}/` },
     });
-    if (error) throw error;
+    if (error) {
+      if (error.status === 429 || /rate limit/i.test(error.message)) {
+        throw new Error('Too many sign-in emails were sent recently. Wait a few minutes, or use the code from an email you already received.');
+      }
+      throw error;
+    }
+  }, []);
+
+  const verifyCode = useCallback(async (email: string, code: string) => {
+    const sb = getSupabase();
+    if (!sb) throw new Error('Saved clients are not configured.');
+    const { error } = await sb.auth.verifyOtp({
+      email: email.trim().toLowerCase(),
+      token: code.replace(/\s/g, ''),
+      type: 'email',
+    });
+    if (error) throw new Error('That code is incorrect or has expired. Request a new email and try the newest code.');
+    setAuthError(null);
   }, []);
 
   const signOut = useCallback(async () => {
@@ -89,6 +117,8 @@ export function ClientsProvider({ children }: { children: React.ReactNode }) {
     const { data: sub } = sb.auth.onAuthStateChange((_event, session) => {
       const email = session?.user.email ?? null;
       setUserEmail(email);
+      // Tidy the address bar once the link has been handled (success or failure).
+      clearAuthParamsFromUrl();
       // Defer: Supabase calls inside this callback can deadlock the auth lock.
       if (email) setTimeout(() => { refreshClients().catch(() => {}); }, 0);
     });
@@ -146,12 +176,12 @@ export function ClientsProvider({ children }: { children: React.ReactNode }) {
   }, [newClient]);
 
   const value = useMemo<ClientsContextValue>(() => ({
-    enabled, userEmail, signIn, signOut,
+    enabled, userEmail, signIn, verifyCode, signOut, authError, clearAuthError,
     clients, loadingList, refreshClients,
     current, hasUnsavedChanges,
     openClient, saveClient, removeClient, startNewClient,
   }), [
-    enabled, userEmail, signIn, signOut, clients, loadingList, refreshClients,
+    enabled, userEmail, signIn, verifyCode, signOut, authError, clearAuthError, clients, loadingList, refreshClients,
     current, hasUnsavedChanges, openClient, saveClient, removeClient, startNewClient,
   ]);
 
