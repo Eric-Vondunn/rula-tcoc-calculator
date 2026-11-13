@@ -73,7 +73,7 @@ export function ClientsProvider({ children }: { children: React.ReactNode }) {
     if (!isAllowedEmail(email)) throw new Error(`Use your @${ALLOWED_EMAIL_DOMAIN} email address.`);
     const { error } = await sb.auth.signInWithOtp({
       email: email.trim().toLowerCase(),
-      options: { emailRedirectTo: `${window.location.origin}/` },
+      options: { emailRedirectTo: `${window.location.origin}/calculator` },
     });
     if (error) {
       if (error.status === 429 || /rate limit/i.test(error.message)) {

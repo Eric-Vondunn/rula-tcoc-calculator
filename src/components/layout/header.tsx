@@ -3,6 +3,7 @@
 import { useCalculator } from '@/hooks/use-calculator';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import { RotateCcw } from 'lucide-react';
 import { PopulationBasisToggle } from '@/components/shared/population-basis-toggle';
 import { ClientMenu, ClientStatus } from '@/components/clients/client-menu';
@@ -15,13 +16,13 @@ export function Header() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rula-mid" title="About this tool">
               <span className="text-xl font-bold text-rula-purple tracking-tight">RULA</span>
               <span className="hidden sm:inline text-sm text-gray-400">|</span>
               <span className="hidden sm:inline text-sm font-medium text-gray-600">
                 Behavioral Health Total Cost of Care Calculator
               </span>
-            </div>
+            </Link>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
