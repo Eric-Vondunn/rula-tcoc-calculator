@@ -156,3 +156,19 @@ describe('calculateScenario', () => {
     expect(result.employerNetSavings).toBeCloseTo(result.netSavings! * 0.80, 0);
   });
 });
+
+describe('IBI cost benchmark', () => {
+  it('is verified, so results carry no unverified-cost note', async () => {
+    const { costBenchmarks, isCostBenchmarkVerified } = await import('@/data/benchmarks');
+    expect(isCostBenchmarkVerified()).toBe(true);
+    expect(costBenchmarks[0].label).not.toMatch(/unverified/i);
+    const pop = {
+      conditionId: 'diabetes', conditionName: 'Diabetes', eligiblePopulation: 1000, estimatedWithCondition: 100,
+      estimatedWithBhComorbidity: 25, estimatedUntreated: 10, prevalenceRate: 0.1, bhComorbidityRate: 0.25,
+      untreatedRate: 0.4, dataAvailable: true, notes: [],
+    } as const;
+    const r = calculateFinancialBurden({ ...pop, notes: [] }, costBenchmarks[0], null, 0.8);
+    expect(r.costBenchmarkStatus).toBe('verified');
+    expect(r.notes.join(' ')).not.toMatch(/unverified/i);
+  });
+});

@@ -9,6 +9,7 @@ import { StatusBadge } from '@/components/shared/status-badge';
 import { formatNumber, formatCurrency } from '@/lib/utils';
 import { InfoTip } from '@/components/shared/info-tip';
 import { OVERLAP_DISCLAIMER, UNVERIFIED_COST_DISCLAIMER } from '@/data/defaults';
+import { isCostBenchmarkVerified } from '@/data/benchmarks';
 import { DollarSign, AlertTriangle, TrendingDown, TrendingUp } from 'lucide-react';
 import {
   BarChart,
@@ -27,6 +28,7 @@ export function FinancialImpact() {
   const { state, derived, updateClientInputs } = useCalculator();
   const { clientInputs } = state;
   const { financialResults, treatedVsUntreatedResults } = derived;
+  const costVerified = isCostBenchmarkVerified();
 
   // Aggregate totals
   const totalUntreated = financialResults.reduce(
@@ -68,15 +70,17 @@ export function FinancialImpact() {
 
   return (
     <div className="space-y-6">
-      {/* Unverified Source Warning */}
-      <Disclaimer variant="caution">
-        <div className="flex items-start gap-2">
-          <div>
-            <p className="font-semibold">Unverified Cost Benchmark</p>
-            <p className="mt-1">{UNVERIFIED_COST_DISCLAIMER}</p>
+      {/* Unverified Source Warning (only while the cost benchmark is unverified) */}
+      {!costVerified && (
+        <Disclaimer variant="caution">
+          <div className="flex items-start gap-2">
+            <div>
+              <p className="font-semibold">Unverified Cost Benchmark</p>
+              <p className="mt-1">{UNVERIFIED_COST_DISCLAIMER}</p>
+            </div>
           </div>
-        </div>
-      </Disclaimer>
+        </Disclaimer>
+      )}
 
       {/* Assumptions Controls */}
       <Card>
@@ -92,7 +96,7 @@ export function FinancialImpact() {
               <p className="text-sm font-medium text-gray-700">Cost Benchmark</p>
               <div className="flex items-center gap-2">
                 <p className="text-lg font-bold text-gray-900">$10,000</p>
-                <StatusBadge status="unverified" label="Unverified" />
+                <StatusBadge status={costVerified ? 'verified' : 'unverified'} />
               </div>
               <p className="text-xs text-gray-400">Annual incremental cost per untreated individual</p>
             </div>
@@ -139,7 +143,7 @@ export function FinancialImpact() {
               <p className="text-2xl font-bold text-gray-900 tracking-tight">{formatNumber(totalUntreated)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Total Modeled Annual Spending<InfoTip>Untreated count × $10,000 annual incremental cost per person. Source: IBI (unverified).</InfoTip></p>
+              <p className="text-sm text-gray-500">Total Modeled Annual Spending<InfoTip>Untreated count × $10,000 annual incremental cost per person. Source: IBI{costVerified ? '' : ' (unverified)'}.</InfoTip></p>
               <p className="text-2xl font-bold text-gray-900 tracking-tight">{formatCurrency(totalModeledSpending)}</p>
             </div>
             <div className="space-y-1">
@@ -417,7 +421,7 @@ export function FinancialImpact() {
                 <tr className="border-b border-gray-200">
                   <th className="text-left py-3 px-4 font-medium text-gray-500">Condition</th>
                   <th className="text-right py-3 px-4 font-medium text-gray-500">Untreated Count<InfoTip>Est. BH comorbidity × 57% untreated rate (NIMH/NSDUH).</InfoTip></th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-500">Cost/Person<InfoTip>$10,000 annual incremental cost per untreated individual. Source: IBI (unverified).</InfoTip></th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-500">Cost/Person<InfoTip>$10,000 annual incremental cost per untreated individual. Source: IBI{costVerified ? '' : ' (unverified)'}.</InfoTip></th>
                   <th className="text-right py-3 px-4 font-medium text-gray-500">Modeled Spending<InfoTip>Untreated count × $10,000 annual incremental cost.</InfoTip></th>
                   <th className="text-right py-3 px-4 font-medium text-gray-500">Potentially Avoidable<InfoTip>Modeled spending × recoverable cost percentage (user-configured).</InfoTip></th>
                 </tr>

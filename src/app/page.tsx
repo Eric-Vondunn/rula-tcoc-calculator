@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { conditionBenchmarks, costBenchmarks, sources } from '@/data/benchmarks';
+import { conditionBenchmarks, costBenchmarks, sources, isCostBenchmarkVerified } from '@/data/benchmarks';
 import { absenteeismBenchmarks as ab, defaultAbsenteeismInputs, defaultClientInputs } from '@/data/defaults';
 import { MEMBERS_PER_EMPLOYEE } from '@/lib/population-basis';
 import { A, CARE } from '@/components/sections/mutual-action-plan/constants';
@@ -19,6 +19,8 @@ const usd = (n: number) =>
 const pct = (n: number, digits = 1) => `${Number((n * 100).toFixed(digits))}%`;
 
 const incrementalCost = costBenchmarks[0].annualIncrementalCost;
+const costVerified = isCostBenchmarkVerified();
+const pendingSourceCount = Object.values(sources).filter((s) => s.approvalStatus === 'pending_verification').length;
 const untreatedRate = conditionBenchmarks.find((c) => c.untreatedRate !== null)?.untreatedRate ?? 0;
 const dailyCost = defaultAbsenteeismInputs.averageSalary / defaultAbsenteeismInputs.workdaysPerYear;
 const rulaPerPerson = ab.rulaCostPerSession * ab.rulaAvgSessions;
@@ -86,8 +88,10 @@ const CAVEATS: { title: string; body: string }[] = [
     body: 'Every figure is a modeled estimate built from national benchmarks and the inputs entered. Actual results depend on the client’s population, engagement, and clinical outcomes.',
   },
   {
-    title: 'Benchmarks are pending verification',
-    body: `All research sources below are marked pending verification. The ${usd(incrementalCost)} annual incremental cost figure has not been independently verified against its cited source.`,
+    title: 'Most benchmarks are pending verification',
+    body: costVerified
+      ? `The ${usd(incrementalCost)} annual incremental cost figure has been verified against a recent IBI study. ${pendingSourceCount} of the ${Object.keys(sources).length} research sources below are still pending formal verification.`
+      : `All research sources below are marked pending verification. The ${usd(incrementalCost)} annual incremental cost figure has not been independently verified against its cited source.`,
   },
   {
     title: 'National data, not client data',
@@ -368,7 +372,7 @@ export default function LandingPage() {
               <AssumptionTable
                 caption="Costs per untreated person, per year"
                 rows={[
-                  ['Modeled incremental cost', usd(incrementalCost), 'IBI figure, unverified. Drives “modeled annual spending.”'],
+                  ['Modeled incremental cost', usd(incrementalCost), `IBI figure, ${costVerified ? 'verified against a recent IBI study' : 'unverified'}. Drives “modeled annual spending.”`],
                   ['Medical claims', `${usd(ab.incrementalMedicalClaimsUntreated)} → ${usd(ab.incrementalMedicalClaimsTreated)}`, 'Incremental claims, untreated → treated.'],
                   ['Short-term disability', `${usd(ab.annualStdBaselineCost)} × ${ab.stdCostMultiplierUntreated} → × ${ab.stdCostMultiplierTreated}`, 'Baseline cost × multiplier, untreated → treated.'],
                   ['Rula treatment', `${usd(ab.rulaCostPerSession)} × ${ab.rulaAvgSessions} sessions = ${usd(rulaPerPerson)}`, 'Average cost per session and sessions per person.'],
@@ -435,6 +439,7 @@ export default function LandingPage() {
                   <p className="mt-0.5 text-xs text-gray-500">
                     {s.publisher}, {s.publicationYear}
                     {s.approvalStatus === 'pending_verification' && ' · Pending verification'}
+                    {s.approvalStatus === 'approved' && ' · Verified'}
                   </p>
                 </li>
               ))}

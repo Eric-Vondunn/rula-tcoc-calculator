@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Disclaimer } from '@/components/shared/disclaimer';
 import { formatNumber, formatCurrency, formatCurrencyExact, formatPercent } from '@/lib/utils';
 import { OVERLAP_DISCLAIMER, FINANCIAL_DISCLAIMER } from '@/data/defaults';
-import { conditionBenchmarks } from '@/data/benchmarks';
+import { conditionBenchmarks, isCostBenchmarkVerified } from '@/data/benchmarks';
 import { computeModel, computePlan, rateOf, ppl, usd, pct, longDate, parseYmd, schedule } from '@/components/sections/mutual-action-plan/calculations';
 import { TAC, MOM, MONTHS, ADDONS, CH } from '@/components/sections/mutual-action-plan/constants';
 import { FollowUpEmail } from '@/components/sections/follow-up-email';
@@ -803,8 +803,12 @@ export function ExecutiveSummary() {
               )}
               <li>Employer-paid share of claims: {(clientInputs.employerPaidShare * 100).toFixed(0)}%</li>
               <li>
-                Incremental cost benchmark: $10,000/year per untreated individual{' '}
-                <Badge variant="warning" className="text-xs">Unverified</Badge>
+                Incremental cost benchmark: $10,000/year per untreated individual (IBI){' '}
+                {isCostBenchmarkVerified() ? (
+                  <Badge variant="success" className="text-xs">Verified</Badge>
+                ) : (
+                  <Badge variant="warning" className="text-xs">Unverified</Badge>
+                )}
               </li>
               <li>Untreated BH rate: ~57% (NIMH/NSDUH general population estimate)</li>
               {clientInputs.recoverableCostPercentage !== null && (
@@ -827,7 +831,9 @@ export function ExecutiveSummary() {
               <li>All prevalence estimates are from national studies and may not match this specific population.</li>
               <li>Condition categories may overlap. Totals should not be summed across conditions.</li>
               <li>Financial projections are modeled associations, not guaranteed outcomes.</li>
-              <li>The $10,000 cost benchmark has not been verified against the claimed source.</li>
+              {!isCostBenchmarkVerified() && (
+                <li>The $10,000 cost benchmark has not been verified against the claimed source.</li>
+              )}
               <li>BH comorbidity rates reflect depression only (not combined depression + anxiety).</li>
               <li>Scenario assumptions are hypothetical unless verified with Rula operational data.</li>
               <li>Absenteeism benchmarks are population averages (Kessler, Greenberg, Loeppke) and may not reflect this employer&apos;s workforce.</li>

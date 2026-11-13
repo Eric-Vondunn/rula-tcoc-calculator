@@ -6,6 +6,7 @@ export const OVERLAP_DISCLAIMER =
 export const FINANCIAL_DISCLAIMER =
   'Financial estimates are modeled projections, not guaranteed outcomes. Actual results depend on population characteristics, treatment engagement, intervention design, and other factors.';
 
+/** Shown only while the selected cost benchmark is unverified. */
 export const UNVERIFIED_COST_DISCLAIMER =
   'The $10,000 annual incremental cost assumption has not been independently verified against the claimed IBI source. Use with appropriate disclosure.';
 

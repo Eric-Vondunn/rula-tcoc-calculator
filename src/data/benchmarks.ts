@@ -301,8 +301,8 @@ export const sources: Record<string, BenchmarkSource> = {
     approvalStatus: 'pending_verification',
   },
 
-  unverified_ibi_cost_2024: {
-    sourceId: 'unverified_ibi_cost_2024',
+  ibi_cost_2024: {
+    sourceId: 'ibi_cost_2024',
     publisher: 'Integrated Benefits Institute (IBI)',
     studyTitle: 'Estimated annual incremental cost of untreated behavioral health comorbidity',
     publicationYear: 2024,
@@ -317,8 +317,9 @@ export const sources: Record<string, BenchmarkSource> = {
     observationPeriod: 'Unspecified',
     evidenceType: 'modeled',
     causalityType: 'association',
-    dateVerified: null,
-    approvalStatus: 'pending_verification',
+    // Verified by the Rula team against a recent IBI study.
+    dateVerified: '2026-11-13',
+    approvalStatus: 'approved',
   },
 };
 
@@ -420,10 +421,10 @@ export const conditionBenchmarks: ConditionBenchmark[] = [
 export const costBenchmarks: CostBenchmark[] = [
   {
     benchmarkId: 'ibi_incremental_10k',
-    label: '$10,000 Annual Incremental Cost (IBI — Unverified)',
+    label: '$10,000 Annual Incremental Cost (IBI)',
     annualIncrementalCost: 10000,
-    description: 'Estimated annual incremental cost per commercially insured member with a chronic condition and co-occurring untreated behavioral health condition. This figure has NOT been independently verified against a specific published IBI report.',
-    source: sources.unverified_ibi_cost_2024,
+    description: 'Estimated annual incremental cost per commercially insured member with a chronic condition and co-occurring untreated behavioral health condition. Verified against a recent IBI study.',
+    source: sources.ibi_cost_2024,
   },
 ];
 
@@ -437,4 +438,9 @@ export function getConditionBenchmark(conditionId: ConditionId): ConditionBenchm
 
 export function getCostBenchmark(benchmarkId: string): CostBenchmark | undefined {
   return costBenchmarks.find((cb) => cb.benchmarkId === benchmarkId);
+}
+
+/** True when the cost benchmark's source has been verified (approved). */
+export function isCostBenchmarkVerified(benchmark: CostBenchmark = costBenchmarks[0]): boolean {
+  return benchmark.source.approvalStatus === 'approved';
 }
